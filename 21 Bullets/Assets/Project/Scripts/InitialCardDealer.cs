@@ -16,7 +16,7 @@ public class InitialCardDealer : MonoBehaviour
     public List<CardData> deckData;
     public Sprite cardBackSprite;
     public GameObject cardPrefab;
-    
+
     public RectTransform playerHandContainer;
     public RectTransform dealerHandContainer;
     public RectTransform deckTransform;
@@ -40,7 +40,7 @@ public class InitialCardDealer : MonoBehaviour
     private bool isPlayerTurn = false;
     private Image dealerHiddenCardImage;
     private int dealerHiddenCardIndex;
-    
+
     private float resetTimer = 0f;
 
     void Start()
@@ -60,7 +60,7 @@ public class InitialCardDealer : MonoBehaviour
         if (Input.GetKey(KeyCode.R))
         {
             resetTimer += Time.deltaTime;
-            if (resetTimer >= 3f)
+            if (resetTimer >= 1.5f)
             {
                 resetTimer = 0f;
                 ResetSequence();
@@ -124,7 +124,7 @@ public class InitialCardDealer : MonoBehaviour
     {
         yield return StartCoroutine(DrawCardRoutine(playerHandContainer, playerCards, playerHandIndices, true, false));
         yield return new WaitForSeconds(delayBetweenCards);
-        
+
         yield return StartCoroutine(DrawCardRoutine(dealerHandContainer, dealerCards, dealerHandIndices, true, false));
         yield return new WaitForSeconds(delayBetweenCards);
 
@@ -147,16 +147,16 @@ public class InitialCardDealer : MonoBehaviour
         indexList.Add(cardIndex);
 
         GameObject newCard = Instantiate(cardPrefab, container);
-        
+
         RectTransform cardRect = newCard.GetComponent<RectTransform>();
-        
+
         if (cardRect != null)
         {
             cardRect.localScale = Vector3.one;
         }
 
         Vector2 targetAnchoredPosition = new Vector2(handList.Count * cardSpacing, 0);
-        
+
         cardRect.anchoredPosition = targetAnchoredPosition;
         Vector3 finalWorldPosition = cardRect.position;
         Vector3 startWorldPosition = deckTransform.position;
@@ -165,7 +165,7 @@ public class InitialCardDealer : MonoBehaviour
         handList.Add(newCard);
 
         Image cardImage = newCard.GetComponent<Image>();
-        
+
         if (cardImage != null)
         {
             cardImage.sprite = cardBackSprite;
@@ -177,12 +177,12 @@ public class InitialCardDealer : MonoBehaviour
         }
 
         float elapsedTime = 0f;
-        
+
         while (elapsedTime < cardMoveDuration)
         {
             float t = elapsedTime / cardMoveDuration;
             float easeOutCubic = 1f - Mathf.Pow(1f - t, 3f);
-            
+
             cardRect.position = Vector3.Lerp(startWorldPosition, finalWorldPosition, easeOutCubic);
             elapsedTime += Time.deltaTime;
             yield return null;
@@ -206,7 +206,7 @@ public class InitialCardDealer : MonoBehaviour
         {
             float t = elapsedTime / halfDuration;
             float smoothStep = t * t * (3f - 2f * t);
-            
+
             float scaleX = Mathf.Lerp(1f, 0f, smoothStep);
             cardRect.localScale = new Vector3(scaleX, 1f, 1f);
             elapsedTime += Time.deltaTime;
@@ -221,7 +221,7 @@ public class InitialCardDealer : MonoBehaviour
         {
             float t = elapsedTime / halfDuration;
             float smoothStep = t * t * (3f - 2f * t);
-            
+
             float scaleX = Mathf.Lerp(0f, 1f, smoothStep);
             cardRect.localScale = new Vector3(scaleX, 1f, 1f);
             elapsedTime += Time.deltaTime;
@@ -244,7 +244,7 @@ public class InitialCardDealer : MonoBehaviour
         yield return StartCoroutine(DrawCardRoutine(playerHandContainer, playerCards, playerHandIndices, true, false));
 
         int playerScore = CalculateHandValue(playerHandIndices);
-        
+
         if (playerScore > 21)
         {
             isPlayerTurn = false;
@@ -311,7 +311,7 @@ public class InitialCardDealer : MonoBehaviour
         foreach (int index in handIndices)
         {
             CardData card = deckData[index];
-            
+
             if (card.isAce)
             {
                 acesCount++;
