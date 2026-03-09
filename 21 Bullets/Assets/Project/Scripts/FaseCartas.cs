@@ -17,15 +17,15 @@ public class FaseCartas : MonoBehaviour
     public Sprite cardBackSprite;
     public GameObject cardPrefab;
     
-    public RectTransform playerHandContainer;
-    public RectTransform dealerHandContainer;
-    public RectTransform deckTransform;
+    public Transform playerHandContainer;
+    public Transform dealerHandContainer;
+    public Transform deckTransform;
 
     public Button hitButton;
     public Button standButton;
     public int dealerThreshold = 14;
 
-    public float cardSpacing = 110f;
+    public float cardSpacing = 1.5f;
     public float cardMoveDuration = 0.4f;
     public float delayBetweenCards = 0.2f;
     public float flipDuration = 0.3f;
@@ -38,7 +38,7 @@ public class FaseCartas : MonoBehaviour
     private List<int> dealerHandIndices = new List<int>();
 
     private bool isPlayerTurn = false;
-    private Image dealerHiddenCardImage;
+    private SpriteRenderer dealerHiddenCardRenderer;
     private int dealerHiddenCardIndex;
     
     private float resetTimer = 0f;
@@ -60,7 +60,7 @@ public class FaseCartas : MonoBehaviour
         if (Input.GetKey(KeyCode.R))
         {
             resetTimer += Time.deltaTime;
-            if (resetTimer >= 1f)
+            if (resetTimer >= 5f)
             {
                 resetTimer = 0f;
                 ResetSequence();
@@ -91,7 +91,7 @@ public class FaseCartas : MonoBehaviour
         dealerHandIndices.Clear();
 
         isPlayerTurn = false;
-        dealerHiddenCardImage = null;
+        dealerHiddenCardRenderer = null;
         hitButton.interactable = false;
         standButton.interactable = false;
 
@@ -138,7 +138,7 @@ public class FaseCartas : MonoBehaviour
         standButton.interactable = true;
     }
 
-    public IEnumerator DrawCardRoutine(RectTransform container, List<GameObject> handList, List<int> indexList, bool isVisible, bool isHiddenDealerCard)
+    public IEnumerator DrawCardRoutine(Transform container, List<GameObject> handList, List<int> indexList, bool isVisible, bool isHiddenDealerCard)
     {
         if (deck.Count == 0) yield break;
 
@@ -147,12 +147,7 @@ public class FaseCartas : MonoBehaviour
         indexList.Add(cardIndex);
 
         GameObject newCard = Instantiate(cardPrefab, container);
-        RectTransform cardRect = newCard.GetComponent<RectTransform>();
-        
-        if (cardRect != null)
-        {
-            cardRect.localScale = Vector3.one;
-        }
+        Transform cardTransform = newCard.transform;
 
         handList.Add(newCard);
         int totalCards = handList.Count;
@@ -160,31 +155,31 @@ public class FaseCartas : MonoBehaviour
         float totalWidth = (totalCards - 1) * cardSpacing;
         float startX = -totalWidth / 2f;
 
-        Vector2[] startPositions = new Vector2[totalCards - 1];
-        Vector2[] targetPositions = new Vector2[totalCards];
+        Vector3[] startPositions = new Vector3[totalCards - 1];
+        Vector3[] targetPositions = new Vector3[totalCards];
 
         for (int i = 0; i < totalCards; i++)
         {
-            targetPositions[i] = new Vector2(startX + (i * cardSpacing), 0);
+            targetPositions[i] = new Vector3(startX + (i * cardSpacing), 0, 0);
             if (i < totalCards - 1)
             {
-                startPositions[i] = handList[i].GetComponent<RectTransform>().anchoredPosition;
+                startPositions[i] = handList[i].transform.localPosition;
             }
         }
 
-        cardRect.anchoredPosition = targetPositions[totalCards - 1];
-        Vector3 finalWorldPosition = cardRect.position;
+        cardTransform.localPosition = targetPositions[totalCards - 1];
+        Vector3 finalWorldPosition = cardTransform.position;
         Vector3 startWorldPosition = deckTransform.position;
-        cardRect.position = startWorldPosition;
+        cardTransform.position = startWorldPosition;
 
-        Image cardImage = newCard.GetComponent<Image>();
+        SpriteRenderer cardRenderer = newCard.GetComponent<SpriteRenderer>();
         
-        if (cardImage != null)
+        if (cardRenderer != null)
         {
-            cardImage.sprite = cardBackSprite;
+            cardRenderer.sprite = cardBackSprite;
             if (isHiddenDealerCard)
             {
-                dealerHiddenCardImage = cardImage;
+                dealerHiddenCardRenderer = cardRenderer;
                 dealerHiddenCardIndex = cardIndex;
             }
         }
@@ -198,27 +193,27 @@ public class FaseCartas : MonoBehaviour
 
             for (int i = 0; i < totalCards - 1; i++)
             {
-                RectTransform existingRect = handList[i].GetComponent<RectTransform>();
-                existingRect.anchoredPosition = Vector2.Lerp(startPositions[i], targetPositions[i], easeOutCubic);
+                Transform existingTransform = handList[i].transform;
+                existingTransform.localPosition = Vector3.Lerp(startPositions[i], targetPositions[i], easeOutCubic);
             }
             
-            cardRect.position = Vector3.Lerp(startWorldPosition, finalWorldPosition, easeOutCubic);
+            cardTransform.position = Vector3.Lerp(startWorldPosition, finalWorldPosition, easeOutCubic);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
         for (int i = 0; i < totalCards; i++)
         {
-            handList[i].GetComponent<RectTransform>().anchoredPosition = targetPositions[i];
+            handList[i].transform.localPosition = targetPositions[i];
         }
 
-        if (isVisible && cardImage != null)
+        if (isVisible && cardRenderer != null)
         {
-            yield return StartCoroutine(FlipCardRoutine(cardRect, cardImage, deckData[cardIndex].cardSprite));
+            yield return StartCoroutine(FlipCardRoutine(cardTransform, cardRenderer, deckData[cardIndex].cardSprite));
         }
     }
 
-    public IEnumerator FlipCardRoutine(RectTransform cardRect, Image cardImage, Sprite targetSprite)
+    public IEnumerator FlipCardRoutine(Transform cardTransform, SpriteRenderer cardRenderer, Sprite targetSprite)
     {
         float halfDuration = flipDuration / 2f;
         float elapsedTime = 0f;
@@ -229,13 +224,13 @@ public class FaseCartas : MonoBehaviour
             float smoothStep = t * t * (3f - 2f * t);
             
             float scaleX = Mathf.Lerp(1f, 0f, smoothStep);
-            cardRect.localScale = new Vector3(scaleX, 1f, 1f);
+            cardTransform.localScale = new Vector3(scaleX * cardPrefab.transform.localScale.x, cardPrefab.transform.localScale.y, cardPrefab.transform.localScale.z);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        cardRect.localScale = new Vector3(0f, 1f, 1f);
-        cardImage.sprite = targetSprite;
+        cardTransform.localScale = new Vector3(0f, cardPrefab.transform.localScale.y, cardPrefab.transform.localScale.z);
+        cardRenderer.sprite = targetSprite;
 
         elapsedTime = 0f;
         while (elapsedTime < halfDuration)
@@ -244,12 +239,12 @@ public class FaseCartas : MonoBehaviour
             float smoothStep = t * t * (3f - 2f * t);
             
             float scaleX = Mathf.Lerp(0f, 1f, smoothStep);
-            cardRect.localScale = new Vector3(scaleX, 1f, 1f);
+            cardTransform.localScale = new Vector3(scaleX * cardPrefab.transform.localScale.x, cardPrefab.transform.localScale.y, cardPrefab.transform.localScale.z);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        cardRect.localScale = Vector3.one;
+        cardTransform.localScale = cardPrefab.transform.localScale;
     }
 
     public void OnHitClicked()
@@ -289,10 +284,9 @@ public class FaseCartas : MonoBehaviour
 
     public IEnumerator DealerRoutine()
     {
-        if (dealerHiddenCardImage != null)
+        if (dealerHiddenCardRenderer != null)
         {
-            RectTransform hiddenRect = dealerHiddenCardImage.GetComponent<RectTransform>();
-            yield return StartCoroutine(FlipCardRoutine(hiddenRect, dealerHiddenCardImage, deckData[dealerHiddenCardIndex].cardSprite));
+            yield return StartCoroutine(FlipCardRoutine(dealerHiddenCardRenderer.transform, dealerHiddenCardRenderer, deckData[dealerHiddenCardIndex].cardSprite));
         }
 
         yield return new WaitForSeconds(delayBetweenCards);
