@@ -2042,7 +2042,7 @@ MonoBehaviour:
   spriteBalaFogueo: {fileID: -4747959639797733161, guid: a2c869905adc844408ff4b65fa3a84b2, type: 3}
   spriteBalaDesconocida: {fileID: -1037103393966706096, guid: 2d3d3be6d7c313c4ca84dd33f62af74a, type: 3}
   corazonLleno: {fileID: -2210958628471894642, guid: 034fb4473ad2a724e81d19b4ec492dff, type: 3}
-  corazonVacio: {fileID: -6020420230899144285, guid: 6c4726d57938ac84ca517a12003bc48d, type: 3}
+  corazonVacio: {fileID: -8260750286679103587, guid: 0d18a640be7d4d14db00561eb48f2514, type: 3}
   slotsBalas:
   - {fileID: 1108582367}
   - {fileID: 916137147}
