@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 [System.Serializable]
 public class CardData
@@ -11,9 +12,15 @@ public class CardData
     public bool isAce;
 }
 
-public class FaseCartas : MonoBehaviour
+public class CartasManager : MonoBehaviour
 {
-    public List<CardData> deckData;
+    public FasesManager fasesManager;
+
+    public Sprite[] allCardSprites;
+    
+    [HideInInspector]
+    public List<CardData> deckData = new List<CardData>();
+    
     public Sprite cardBackSprite;
     public GameObject cardPrefab;
     
@@ -30,6 +37,10 @@ public class FaseCartas : MonoBehaviour
     public float delayBetweenCards = 0.2f;
     public float flipDuration = 0.3f;
 
+    public TextMeshProUGUI textoPuntosJugador;
+    public TextMeshProUGUI textoPuntosDealer;
+    public TextMeshProUGUI textoInformacion;
+
     private List<int> deck = new List<int>();
     private List<GameObject> playerCards = new List<GameObject>();
     private List<GameObject> dealerCards = new List<GameObject>();
@@ -40,36 +51,12 @@ public class FaseCartas : MonoBehaviour
     private bool isPlayerTurn = false;
     private SpriteRenderer dealerHiddenCardRenderer;
     private int dealerHiddenCardIndex;
-    
-    private float resetTimer = 0f;
+    private bool dealerCardRevealed = false;
 
-    void Start()
+    void Awake()
     {
-        hitButton.interactable = false;
-        standButton.interactable = false;
-
-        hitButton.onClick.AddListener(OnHitClicked);
-        standButton.onClick.AddListener(OnStandClicked);
-
-        InitializeDeck();
-        StartCoroutine(DealInitialCardsRoutine());
-    }
-
-    void Update()
-    {
-        if (Input.GetKey(KeyCode.R))
-        {
-            resetTimer += Time.deltaTime;
-            if (resetTimer >= 5f)
-            {
-                resetTimer = 0f;
-                ResetSequence();
-            }
-        }
-        else
-        {
-            resetTimer = 0f;
-        }
+        if (hitButton != null) hitButton.onClick.AddListener(OnHitClicked);
+        if (standButton != null) standButton.onClick.AddListener(OnStandClicked);
     }
 
     public void ResetSequence()
@@ -92,15 +79,52 @@ public class FaseCartas : MonoBehaviour
 
         isPlayerTurn = false;
         dealerHiddenCardRenderer = null;
-        hitButton.interactable = false;
-        standButton.interactable = false;
+        dealerCardRevealed = false;
+        
+        if (hitButton != null) hitButton.interactable = false;
+        if (standButton != null) standButton.interactable = false;
+
+        if (textoPuntosJugador != null) textoPuntosJugador.text = "0";
+        if (textoPuntosDealer != null) textoPuntosDealer.text = "0";
+        if (textoInformacion != null) textoInformacion.text = "";
 
         InitializeDeck();
         StartCoroutine(DealInitialCardsRoutine());
     }
 
+    public void AutoBuildDeck()
+    {
+        deckData.Clear();
+        for (int i = 0; i < allCardSprites.Length; i++)
+        {
+            CardData newCard = new CardData();
+            newCard.cardSprite = allCardSprites[i];
+
+            int rank = (i % 13) + 1;
+            
+            if (rank == 1)
+            {
+                newCard.isAce = true;
+                newCard.cardValue = 11;
+            }
+            else if (rank > 10)
+            {
+                newCard.isAce = false;
+                newCard.cardValue = 10;
+            }
+            else
+            {
+                newCard.isAce = false;
+                newCard.cardValue = rank;
+            }
+            
+            deckData.Add(newCard);
+        }
+    }
+
     public void InitializeDeck()
     {
+        AutoBuildDeck();
         deck.Clear();
         for (int i = 0; i < deckData.Count; i++)
         {
@@ -134,8 +158,10 @@ public class FaseCartas : MonoBehaviour
         yield return StartCoroutine(DrawCardRoutine(dealerHandContainer, dealerCards, dealerHandIndices, false, true));
 
         isPlayerTurn = true;
-        hitButton.interactable = true;
-        standButton.interactable = true;
+        if (hitButton != null) hitButton.interactable = true;
+        if (standButton != null) standButton.interactable = true;
+        
+        ActualizarPuntuacionUI();
     }
 
     public IEnumerator DrawCardRoutine(Transform container, List<GameObject> handList, List<int> indexList, bool isVisible, bool isHiddenDealerCard)
@@ -250,26 +276,29 @@ public class FaseCartas : MonoBehaviour
     public void OnHitClicked()
     {
         if (!isPlayerTurn) return;
-        hitButton.interactable = false;
-        standButton.interactable = false;
+        if (hitButton != null) hitButton.interactable = false;
+        if (standButton != null) standButton.interactable = false;
         StartCoroutine(HitRoutine());
     }
 
     public IEnumerator HitRoutine()
     {
         yield return StartCoroutine(DrawCardRoutine(playerHandContainer, playerCards, playerHandIndices, true, false));
-
+        
+        ActualizarPuntuacionUI();
         int playerScore = CalculateHandValue(playerHandIndices);
         
         if (playerScore > 21)
         {
             isPlayerTurn = false;
-            Debug.Log("Derrota automatica: El jugador supero los 21 puntos.");
+            if (textoInformacion != null) textoInformacion.text = "¡Te has pasado de 21! El Dealer gana.";
+            yield return new WaitForSeconds(2.5f);
+            fasesManager.IniciarFaseDisparo(false);
         }
         else
         {
-            hitButton.interactable = true;
-            standButton.interactable = true;
+            if (hitButton != null) hitButton.interactable = true;
+            if (standButton != null) standButton.interactable = true;
         }
     }
 
@@ -277,8 +306,8 @@ public class FaseCartas : MonoBehaviour
     {
         if (!isPlayerTurn) return;
         isPlayerTurn = false;
-        hitButton.interactable = false;
-        standButton.interactable = false;
+        if (hitButton != null) hitButton.interactable = false;
+        if (standButton != null) standButton.interactable = false;
         StartCoroutine(DealerRoutine());
     }
 
@@ -289,11 +318,14 @@ public class FaseCartas : MonoBehaviour
             yield return StartCoroutine(FlipCardRoutine(dealerHiddenCardRenderer.transform, dealerHiddenCardRenderer, deckData[dealerHiddenCardIndex].cardSprite));
         }
 
+        dealerCardRevealed = true;
+        ActualizarPuntuacionUI();
         yield return new WaitForSeconds(delayBetweenCards);
 
         while (CalculateHandValue(dealerHandIndices) < dealerThreshold)
         {
             yield return StartCoroutine(DrawCardRoutine(dealerHandContainer, dealerCards, dealerHandIndices, true, false));
+            ActualizarPuntuacionUI();
             yield return new WaitForSeconds(delayBetweenCards);
         }
 
@@ -302,19 +334,50 @@ public class FaseCartas : MonoBehaviour
 
         if (dealerScore > 21)
         {
-            Debug.Log("El Dealer se paso de 21. Jugador gana el derecho a disparar.");
+            if (textoInformacion != null) textoInformacion.text = "¡El Dealer se ha pasado! Ganas el turno.";
+            yield return new WaitForSeconds(2.5f);
+            fasesManager.IniciarFaseDisparo(true);
         }
         else if (playerScore > dealerScore)
         {
-            Debug.Log("Jugador gana la fase de cartas por puntos.");
+            if (textoInformacion != null) textoInformacion.text = "¡Ganas por puntos! Tienes el arma.";
+            yield return new WaitForSeconds(2.5f);
+            fasesManager.IniciarFaseDisparo(true);
         }
         else if (dealerScore > playerScore)
         {
-            Debug.Log("Dealer gana la fase de cartas por puntos.");
+            if (textoInformacion != null) textoInformacion.text = "El Dealer gana por puntos. Preparate...";
+            yield return new WaitForSeconds(2.5f);
+            fasesManager.IniciarFaseDisparo(false);
         }
         else
         {
-            Debug.Log("Empate en la fase de cartas.");
+            if (textoInformacion != null) textoInformacion.text = "¡Empate! Se vuelve a repartir.";
+            yield return new WaitForSeconds(2.5f);
+            fasesManager.IniciarFaseCartas();
+        }
+    }
+
+    private void ActualizarPuntuacionUI()
+    {
+        if (textoPuntosJugador != null)
+        {
+            textoPuntosJugador.text = CalculateHandValue(playerHandIndices).ToString();
+        }
+
+        if (textoPuntosDealer != null)
+        {
+            if (!dealerCardRevealed && dealerHandIndices.Count > 0)
+            {
+                List<int> cartasVisibles = new List<int>(dealerHandIndices);
+                cartasVisibles.Remove(dealerHiddenCardIndex);
+                int puntuacionVisible = CalculateHandValue(cartasVisibles);
+                textoPuntosDealer.text = puntuacionVisible.ToString() + " + ?";
+            }
+            else
+            {
+                textoPuntosDealer.text = CalculateHandValue(dealerHandIndices).ToString();
+            }
         }
     }
 

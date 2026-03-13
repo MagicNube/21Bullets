@@ -1312,173 +1312,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1271490917}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c22a197fe694e44b97d56963c167fcf, type: 3}
+  m_Script: {fileID: 11500000, guid: 145306adb9f1dd04290fcae5dc0e9491, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deckData:
-  - cardSprite: {fileID: -2364073077325501991, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 0
-    isAce: 1
-  - cardSprite: {fileID: -2076147174, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 2
-    isAce: 0
-  - cardSprite: {fileID: 1597835107, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 3
-    isAce: 0
-  - cardSprite: {fileID: 679546559, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 4
-    isAce: 0
-  - cardSprite: {fileID: -432977609, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 5
-    isAce: 0
-  - cardSprite: {fileID: -642686120, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 6
-    isAce: 0
-  - cardSprite: {fileID: 1420116912, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 7
-    isAce: 0
-  - cardSprite: {fileID: 182344499, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 8
-    isAce: 0
-  - cardSprite: {fileID: 991567822, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 9
-    isAce: 0
-  - cardSprite: {fileID: -785653931, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: 556776885, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: 293068692, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: 40280081, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: -204735404437469645, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 0
-    isAce: 1
-  - cardSprite: {fileID: 190338666, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 2
-    isAce: 0
-  - cardSprite: {fileID: 1286670454, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 3
-    isAce: 0
-  - cardSprite: {fileID: -1002967818, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 4
-    isAce: 0
-  - cardSprite: {fileID: 1775955883, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 5
-    isAce: 0
-  - cardSprite: {fileID: -10177182, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 6
-    isAce: 0
-  - cardSprite: {fileID: 85111752, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 7
-    isAce: 0
-  - cardSprite: {fileID: 1930180117, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 8
-    isAce: 0
-  - cardSprite: {fileID: -1646049054, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 9
-    isAce: 0
-  - cardSprite: {fileID: -1899514214, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: -1993819088, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: -1167591447, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: -1646049054, guid: 8e44954436e1b3d4ab8b28ca4da64269, type: 3}
-    cardValue: 9
-    isAce: 0
-  - cardSprite: {fileID: 6032233739914528125, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 0
-    isAce: 1
-  - cardSprite: {fileID: -1462586185, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 2
-    isAce: 0
-  - cardSprite: {fileID: -784790924, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 3
-    isAce: 0
-  - cardSprite: {fileID: 806101212, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 4
-    isAce: 0
-  - cardSprite: {fileID: -960908387, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 5
-    isAce: 0
-  - cardSprite: {fileID: 2080492490, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 6
-    isAce: 0
-  - cardSprite: {fileID: 708042754, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 7
-    isAce: 0
-  - cardSprite: {fileID: 208022101, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 8
-    isAce: 0
-  - cardSprite: {fileID: -540572392, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 9
-    isAce: 0
-  - cardSprite: {fileID: -662058359, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: -713540563, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: 327300467, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: -1240517532, guid: 42f0f27f10facf24d85eef6488a8eacd, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: -3512908497659101661, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 0
-    isAce: 1
-  - cardSprite: {fileID: -1181855516, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 2
-    isAce: 0
-  - cardSprite: {fileID: -1429343540, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 3
-    isAce: 0
-  - cardSprite: {fileID: 422678044, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 4
-    isAce: 0
-  - cardSprite: {fileID: 34323835, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 5
-    isAce: 0
-  - cardSprite: {fileID: 618496720, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 6
-    isAce: 0
-  - cardSprite: {fileID: 936091796, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 7
-    isAce: 0
-  - cardSprite: {fileID: 2076619692, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 8
-    isAce: 0
-  - cardSprite: {fileID: 442282313, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 9
-    isAce: 0
-  - cardSprite: {fileID: -33456436, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: 547836443, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: 1082932530, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 10
-    isAce: 0
-  - cardSprite: {fileID: -1443950949, guid: becf0ab55b107d2499a665c5d29b3175, type: 3}
-    cardValue: 10
-    isAce: 0
-  cardBackSprite: {fileID: 8974260746979706593, guid: bb9493327c262024381cac9cb6f77b8d, type: 3}
-  cardPrefab: {fileID: 4079248214209046688, guid: deca84925919d5343a5ad3092f09ba02, type: 3}
-  playerHandContainer: {fileID: 399611758}
-  dealerHandContainer: {fileID: 511054314}
-  deckTransform: {fileID: 1851898961}
-  hitButton: {fileID: 1567467184}
-  standButton: {fileID: 769371268}
+  fasesManager: {fileID: 0}
+  deckData: []
+  cardBackSprite: {fileID: 0}
+  cardPrefab: {fileID: 0}
+  playerHandContainer: {fileID: 0}
+  dealerHandContainer: {fileID: 0}
+  deckTransform: {fileID: 0}
+  hitButton: {fileID: 0}
+  standButton: {fileID: 0}
   dealerThreshold: 14
   cardSpacing: 1.5
   cardMoveDuration: 0.4
@@ -1953,11 +1798,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1842673645}
   m_CullTransparentMesh: 1
---- !u!224 &1851898961 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 4804452314268086990, guid: 3913495310cc5af47b3bfdac023073ce, type: 3}
-  m_PrefabInstance: {fileID: 2079034065665277704}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1896424739
 GameObject:
   m_ObjectHideFlags: 0
@@ -2216,22 +2056,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0322ddea97fb0204d9108f3e5b1d28a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spriteBalaReal: {fileID: -4297269366619183174, guid: 8f1f373d6777d2d4c95203f63a6271fb, type: 3}
-  spriteBalaFogueo: {fileID: -4747959639797733161, guid: a2c869905adc844408ff4b65fa3a84b2, type: 3}
-  slotsBalas:
-  - {fileID: 1108582367}
-  - {fileID: 916137147}
-  - {fileID: 1518703496}
-  - {fileID: 238546267}
-  - {fileID: 976106743}
-  - {fileID: 1917048371}
-  textoReales: {fileID: 615389442}
-  textoFogueo: {fileID: 1842673647}
-  sonidoDisparoReal: {fileID: 8300000, guid: b95d8d63a0da55844a230a5793b1f99d, type: 3}
-  sonidoDisparoFogueo: {fileID: 8300000, guid: 53c1b62eee792c041a1f8bd350a2a692, type: 3}
-  audioSource: {fileID: 0}
-  cargadorLogico: []
-  indiceActual: 0
 --- !u!82 &1990319532
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2337,6 +2161,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1174477032223211743, guid: 3913495310cc5af47b3bfdac023073ce, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4804452314268086990, guid: 3913495310cc5af47b3bfdac023073ce, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
