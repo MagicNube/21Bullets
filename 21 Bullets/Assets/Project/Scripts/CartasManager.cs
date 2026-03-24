@@ -12,6 +12,7 @@ public class CardData
     public bool isAce;
 }
 
+[RequireComponent(typeof(AudioSource))]
 public class CartasManager : MonoBehaviour
 {
     public FasesManager fasesManager;
@@ -41,6 +42,8 @@ public class CartasManager : MonoBehaviour
     public TextMeshProUGUI textoPuntosDealer;
     public TextMeshProUGUI textoInformacion;
 
+    public AudioClip sonidoRepartirCarta;
+
     private List<int> deck = new List<int>();
     private List<GameObject> playerCards = new List<GameObject>();
     private List<GameObject> dealerCards = new List<GameObject>();
@@ -52,9 +55,13 @@ public class CartasManager : MonoBehaviour
     private SpriteRenderer dealerHiddenCardRenderer;
     private int dealerHiddenCardIndex;
     private bool dealerCardRevealed = false;
+    
+    private AudioSource audioSource;
 
     void Awake()
     {
+        audioSource = GetComponent<AudioSource>();
+        
         if (hitButton != null) hitButton.onClick.AddListener(OnHitClicked);
         if (standButton != null) standButton.onClick.AddListener(OnStandClicked);
     }
@@ -208,6 +215,11 @@ public class CartasManager : MonoBehaviour
                 dealerHiddenCardRenderer = cardRenderer;
                 dealerHiddenCardIndex = cardIndex;
             }
+        }
+
+        if (audioSource != null && sonidoRepartirCarta != null)
+        {
+            audioSource.PlayOneShot(sonidoRepartirCarta);
         }
 
         float elapsedTime = 0f;
