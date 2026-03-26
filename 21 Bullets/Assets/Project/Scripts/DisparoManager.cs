@@ -7,6 +7,7 @@ using TMPro;
 public class DisparoManager : MonoBehaviour
 {
     public FasesManager fasesManager;
+    public DealerIANovato dealerIA;
 
     public Sprite spriteBalaReal;
     public Sprite spriteBalaFogueo;
@@ -34,6 +35,7 @@ public class DisparoManager : MonoBehaviour
     private int vidasDealer = 3;
     private bool turnoTerminado = false;
     private bool volverAFaseCartas = false;
+    private bool turnoDelJugadorActual = false;
 
     void Awake()
     {
@@ -42,59 +44,39 @@ public class DisparoManager : MonoBehaviour
         vidasDealer = 3;
         ActualizarCorazonesUI();
 
-        if (botonYo != null) botonYo.onClick.AddListener(DispararAYo);
-        if (botonDealer != null) botonDealer.onClick.AddListener(DispararADealer);
+        if (botonYo != null) 
+        {
+            botonYo.onClick.RemoveAllListeners();
+            botonYo.onClick.AddListener(DispararAYo);
+        }
+        
+        if (botonDealer != null) 
+        {
+            botonDealer.onClick.RemoveAllListeners();
+            botonDealer.onClick.AddListener(DispararADealer);
+        }
     }
 
     public void IniciarFase(bool turnoJugador)
     {
         volverAFaseCartas = false;
+        turnoDelJugadorActual = turnoJugador;
         
         if (tambor.Count == 0 || indiceActual >= tambor.Count)
         {
             CargarTambor();
         }
 
-        SetInteractuable(turnoJugador);
+        SetInteractuable(turnoDelJugadorActual);
         
         if (textoPantalla != null)
         {
-            textoPantalla.text = turnoJugador ? "TU TURNO: Elige objetivo" : "TURNO DEL DEALER (Espera...)";
+            textoPantalla.text = turnoDelJugadorActual ? "TU TURNO: Elige objetivo" : "TURNO DEL DEALER (Espera...)";
         }
 
-        // Si no es tu turno, arranca el cerebro básico del Dealer
-        if (!turnoJugador)
+        if (!turnoDelJugadorActual && dealerIA != null)
         {
-            StartCoroutine(TurnoDealerRoutine());
-        }
-    }
-
-    private IEnumerator TurnoDealerRoutine()
-    {
-        // El Dealer espera 1.5 segundos para darle tensión al momento
-        yield return new WaitForSeconds(1.5f);
-
-        if (!ComprobarSeguridad()) yield break;
-
-        // El Dealer decide dispararte a ti siempre (por ahora)
-        bool esReal = EjecutarDisparoLogico();
-
-        if (esReal)
-        {
-            vidasJugador--;
-            ActualizarCorazonesUI();
-            FinalizarTurno("¡El Dealer te ha disparado con una BALA REAL!", true);
-        }
-        else
-        {
-            if (indiceActual >= tambor.Count)
-            {
-                FinalizarTurno("¡FOGUEO! Te salvaste. Tambor vacio.", true);
-            }
-            else
-            {
-                FinalizarTurno("¡FOGUEO! El Dealer te disparo pero te salvaste.", true);
-            }
+            dealerIA.IniciarTurno();
         }
     }
 
@@ -114,8 +96,17 @@ public class DisparoManager : MonoBehaviour
             }
             else
             {
-                SetInteractuable(true);
-                if (textoPantalla != null) textoPantalla.text = "FASE DE DISPARO: Elige objetivo";
+                if (turnoDelJugadorActual)
+                {
+                    SetInteractuable(true);
+                    if (textoPantalla != null) textoPantalla.text = "TU TURNO: Elige objetivo";
+                }
+                else
+                {
+                    SetInteractuable(false);
+                    if (textoPantalla != null) textoPantalla.text = "TURNO DEL DEALER (Espera...)";
+                    if (dealerIA != null) dealerIA.IniciarTurno();
+                }
             }
         }
     }
@@ -151,30 +142,91 @@ public class DisparoManager : MonoBehaviour
         ActualizarContadoresTexto(numReales, numFogueo);
     }
 
+    public int ObtenerRealesRestantes()
+    {
+        int count = 0;
+        for (int i = indiceActual; i < tambor.Count; i++)
+        {
+            if (tambor[i]) count++;
+        }
+        return count;
+    }
+
+    public int ObtenerFogueosRestantes()
+    {
+        int count = 0;
+        for (int i = indiceActual; i < tambor.Count; i++)
+        {
+            if (!tambor[i]) count++;
+        }
+        return count;
+    }
+
+    public void RecibirDecisionDealer(bool dispararAJugador)
+    {
+        StartCoroutine(EjecutarDisparoDealerRoutine(dispararAJugador));
+    }
+
+    private IEnumerator EjecutarDisparoDealerRoutine(bool dispararAJugador)
+    {
+        if (textoPantalla != null)
+        {
+            textoPantalla.text = dispararAJugador ? "El Dealer te apunta a TI..." : "El Dealer se apunta a SI MISMO...";
+        }
+
+        yield return new WaitForSeconds(1.5f);
+
+        if (!ComprobarSeguridad()) yield break;
+
+        bool esReal = EjecutarDisparoLogico();
+        bool tamborVacio = (indiceActual >= tambor.Count);
+
+        if (dispararAJugador)
+        {
+            if (esReal)
+            {
+                vidasJugador--;
+                ActualizarCorazonesUI();
+                FinalizarTurno(tamborVacio ? "¡BALA REAL! El Dealer te ha dañado. Tambor vacio." : "¡BALA REAL! El Dealer te ha dañado. Volviendo a las cartas...", true);
+            }
+            else
+            {
+                FinalizarTurno(tamborVacio ? "¡FOGUEO! El Dealer te disparo y fallo. Tambor vacio." : "¡FOGUEO! El Dealer te disparo y fallo. Volviendo a las cartas...", true);
+            }
+        }
+        else
+        {
+            if (esReal)
+            {
+                vidasDealer--;
+                ActualizarCorazonesUI();
+                FinalizarTurno(tamborVacio ? "¡BALA REAL! El Dealer se ha dañado a si mismo. Tambor vacio." : "¡BALA REAL! El Dealer se ha dañado. Volviendo a las cartas...", true);
+            }
+            else
+            {
+                turnoDelJugadorActual = false;
+                FinalizarTurno(tamborVacio ? "¡FOGUEO! El Dealer se disparo y se salva. Tambor vacio." : "¡FOGUEO! El Dealer se salva y MANTIENE EL TURNO.", tamborVacio);
+            }
+        }
+    }
+
     public void DispararAYo()
     {
         if (!ComprobarSeguridad()) return;
 
         bool esReal = EjecutarDisparoLogico();
+        bool tamborVacio = (indiceActual >= tambor.Count);
 
         if (esReal)
         {
             vidasJugador--;
             ActualizarCorazonesUI();
-            FinalizarTurno("¡BALA REAL! Te has dañado.", true);
+            FinalizarTurno(tamborVacio ? "¡BALA REAL! Te has dañado. Tambor vacio." : "¡BALA REAL! Te has dañado. Volviendo a las cartas...", true);
         }
         else
         {
-            if (indiceActual >= tambor.Count)
-            {
-                FinalizarTurno("¡FOGUEO! Tambor vacio.", true);
-            }
-            else
-            {
-                if (textoPantalla != null) textoPantalla.text = "¡FOGUEO! Mantienes el turno. Dispara otra vez.";
-                SetInteractuable(true);
-                turnoTerminado = false;
-            }
+            turnoDelJugadorActual = true;
+            FinalizarTurno(tamborVacio ? "¡FOGUEO! Te salvaste. Tambor vacio." : "¡FOGUEO! Te salvaste. Mantienes el turno.", tamborVacio);
         }
     }
 
@@ -183,23 +235,17 @@ public class DisparoManager : MonoBehaviour
         if (!ComprobarSeguridad()) return;
 
         bool esReal = EjecutarDisparoLogico();
+        bool tamborVacio = (indiceActual >= tambor.Count);
 
         if (esReal)
         {
             vidasDealer--;
             ActualizarCorazonesUI();
-            FinalizarTurno("¡IMPACTO! El Dealer recibe daño.", true);
+            FinalizarTurno(tamborVacio ? "¡IMPACTO! El Dealer recibe daño. Tambor vacio." : "¡IMPACTO! El Dealer recibe daño. Volviendo a las cartas...", true);
         }
         else
         {
-            if (indiceActual >= tambor.Count)
-            {
-                FinalizarTurno("¡FOGUEO! El Dealer se salva. Tambor vacio.", true);
-            }
-            else
-            {
-                FinalizarTurno("¡FOGUEO! El Dealer se salva. Pierdes el turno.", true);
-            }
+            FinalizarTurno(tamborVacio ? "¡FOGUEO! El Dealer se salva. Tambor vacio." : "¡FOGUEO! El Dealer se salva. Volviendo a las cartas...", true);
         }
     }
 
