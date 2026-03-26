@@ -18,13 +18,13 @@ public class CartasManager : MonoBehaviour
     public FasesManager fasesManager;
 
     public Sprite[] allCardSprites;
-    
+
     [HideInInspector]
     public List<CardData> deckData = new List<CardData>();
-    
+
     public Sprite cardBackSprite;
     public GameObject cardPrefab;
-    
+
     public Transform playerHandContainer;
     public Transform dealerHandContainer;
     public Transform deckTransform;
@@ -55,13 +55,13 @@ public class CartasManager : MonoBehaviour
     private SpriteRenderer dealerHiddenCardRenderer;
     private int dealerHiddenCardIndex;
     private bool dealerCardRevealed = false;
-    
+
     private AudioSource audioSource;
 
     void Awake()
     {
         audioSource = GetComponent<AudioSource>();
-        
+
         if (hitButton != null) hitButton.onClick.AddListener(OnHitClicked);
         if (standButton != null) standButton.onClick.AddListener(OnStandClicked);
     }
@@ -87,7 +87,7 @@ public class CartasManager : MonoBehaviour
         isPlayerTurn = false;
         dealerHiddenCardRenderer = null;
         dealerCardRevealed = false;
-        
+
         if (hitButton != null) hitButton.interactable = false;
         if (standButton != null) standButton.interactable = false;
 
@@ -108,7 +108,7 @@ public class CartasManager : MonoBehaviour
             newCard.cardSprite = allCardSprites[i];
 
             int rank = (i % 13) + 1;
-            
+
             if (rank == 1)
             {
                 newCard.isAce = true;
@@ -124,7 +124,7 @@ public class CartasManager : MonoBehaviour
                 newCard.isAce = false;
                 newCard.cardValue = rank;
             }
-            
+
             deckData.Add(newCard);
         }
     }
@@ -155,19 +155,19 @@ public class CartasManager : MonoBehaviour
     {
         yield return StartCoroutine(DrawCardRoutine(playerHandContainer, playerCards, playerHandIndices, true, false));
         yield return new WaitForSeconds(delayBetweenCards);
-        
+
         yield return StartCoroutine(DrawCardRoutine(dealerHandContainer, dealerCards, dealerHandIndices, true, false));
         yield return new WaitForSeconds(delayBetweenCards);
 
         yield return StartCoroutine(DrawCardRoutine(playerHandContainer, playerCards, playerHandIndices, true, false));
         yield return new WaitForSeconds(delayBetweenCards);
-        
+
         yield return StartCoroutine(DrawCardRoutine(dealerHandContainer, dealerCards, dealerHandIndices, false, true));
 
         isPlayerTurn = true;
         if (hitButton != null) hitButton.interactable = true;
         if (standButton != null) standButton.interactable = true;
-        
+
         ActualizarPuntuacionUI();
     }
 
@@ -206,7 +206,7 @@ public class CartasManager : MonoBehaviour
         cardTransform.position = startWorldPosition;
 
         SpriteRenderer cardRenderer = newCard.GetComponent<SpriteRenderer>();
-        
+
         if (cardRenderer != null)
         {
             cardRenderer.sprite = cardBackSprite;
@@ -223,7 +223,7 @@ public class CartasManager : MonoBehaviour
         }
 
         float elapsedTime = 0f;
-        
+
         while (elapsedTime < cardMoveDuration)
         {
             float t = elapsedTime / cardMoveDuration;
@@ -234,7 +234,7 @@ public class CartasManager : MonoBehaviour
                 Transform existingTransform = handList[i].transform;
                 existingTransform.localPosition = Vector3.Lerp(startPositions[i], targetPositions[i], easeOutCubic);
             }
-            
+
             cardTransform.position = Vector3.Lerp(startWorldPosition, finalWorldPosition, easeOutCubic);
             elapsedTime += Time.deltaTime;
             yield return null;
@@ -260,7 +260,7 @@ public class CartasManager : MonoBehaviour
         {
             float t = elapsedTime / halfDuration;
             float smoothStep = t * t * (3f - 2f * t);
-            
+
             float scaleX = Mathf.Lerp(1f, 0f, smoothStep);
             cardTransform.localScale = new Vector3(scaleX * cardPrefab.transform.localScale.x, cardPrefab.transform.localScale.y, cardPrefab.transform.localScale.z);
             elapsedTime += Time.deltaTime;
@@ -275,7 +275,7 @@ public class CartasManager : MonoBehaviour
         {
             float t = elapsedTime / halfDuration;
             float smoothStep = t * t * (3f - 2f * t);
-            
+
             float scaleX = Mathf.Lerp(0f, 1f, smoothStep);
             cardTransform.localScale = new Vector3(scaleX * cardPrefab.transform.localScale.x, cardPrefab.transform.localScale.y, cardPrefab.transform.localScale.z);
             elapsedTime += Time.deltaTime;
@@ -296,14 +296,14 @@ public class CartasManager : MonoBehaviour
     public IEnumerator HitRoutine()
     {
         yield return StartCoroutine(DrawCardRoutine(playerHandContainer, playerCards, playerHandIndices, true, false));
-        
+
         ActualizarPuntuacionUI();
         int playerScore = CalculateHandValue(playerHandIndices);
-        
+
         if (playerScore > 21)
         {
             isPlayerTurn = false;
-            if (textoInformacion != null) textoInformacion.text = "¡Te has pasado de 21! El Dealer gana.";
+            if (textoInformacion != null) textoInformacion.text = "El Dealer gana.";
             yield return new WaitForSeconds(2.5f);
             fasesManager.IniciarFaseDisparo(false);
         }
@@ -346,25 +346,25 @@ public class CartasManager : MonoBehaviour
 
         if (dealerScore > 21)
         {
-            if (textoInformacion != null) textoInformacion.text = "¡El Dealer se ha pasado! Ganas el turno.";
+            if (textoInformacion != null) textoInformacion.text = "¡El Dealer se ha pasado!";
             yield return new WaitForSeconds(2.5f);
             fasesManager.IniciarFaseDisparo(true);
         }
         else if (playerScore > dealerScore)
         {
-            if (textoInformacion != null) textoInformacion.text = "¡Ganas por puntos! Tienes el arma.";
+            if (textoInformacion != null) textoInformacion.text = "¡Ganas por puntos! ";
             yield return new WaitForSeconds(2.5f);
             fasesManager.IniciarFaseDisparo(true);
         }
         else if (dealerScore > playerScore)
         {
-            if (textoInformacion != null) textoInformacion.text = "El Dealer gana por puntos. Preparate...";
+            if (textoInformacion != null) textoInformacion.text = "El Dealer gana.";
             yield return new WaitForSeconds(2.5f);
             fasesManager.IniciarFaseDisparo(false);
         }
         else
         {
-            if (textoInformacion != null) textoInformacion.text = "¡Empate! Se vuelve a repartir.";
+            if (textoInformacion != null) textoInformacion.text = "¡Empate!";
             yield return new WaitForSeconds(2.5f);
             fasesManager.IniciarFaseCartas();
         }
@@ -401,7 +401,7 @@ public class CartasManager : MonoBehaviour
         foreach (int index in handIndices)
         {
             CardData card = deckData[index];
-            
+
             if (card.isAce)
             {
                 acesCount++;

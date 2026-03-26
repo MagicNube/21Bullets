@@ -10,7 +10,8 @@ public class FasesManager : MonoBehaviour
     public DisparoManager disparoManager;
     public AnimacionTambor animacionTambor;
 
-    public TextMeshProUGUI textoPantalla;
+    public TextMeshProUGUI textoCartas;
+    public TextMeshProUGUI textoDisparo;
 
     private bool juegoIniciado = false;
 
@@ -18,7 +19,7 @@ public class FasesManager : MonoBehaviour
     {
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
-        textoPantalla.text = "(Click para iniciar el juego)";
+        textoCartas.text = "(Click para iniciar)";
     }
 
     void Update()
@@ -38,7 +39,7 @@ public class FasesManager : MonoBehaviour
     {
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
-        textoPantalla.text = "";
+        textoCartas.text = "";
 
         // Le pedimos al DisparoManager que calcule las balas SIN empezar a disparar
         disparoManager.PrepararNuevaRonda();
@@ -59,15 +60,17 @@ public class FasesManager : MonoBehaviour
     // FASE 2: Se juegan las cartas para decidir quién tiene el turno
     public void IniciarFaseCartas()
     {
+        textoDisparo.text = "";
         contenedorDisparo.SetActive(false);
         contenedorCartas.SetActive(true);
-        textoPantalla.text = "Gana la mano para tener el primer turno.";
+        textoCartas.text = "Gana la mano para tener el primer turno.";
         cartasManager.ResetSequence();
     }
 
     // FASE 3: El ganador de las cartas empieza a disparar
     public void IniciarFaseDisparo(bool ganaJugador)
     {
+        textoCartas.text = "";
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(true);
         disparoManager.IniciarFase(ganaJugador);
@@ -76,7 +79,7 @@ public class FasesManager : MonoBehaviour
     // Función para reiniciar el ciclo completo si el tambor se vacía sin que nadie muera
     public void ReiniciarRondaCompleta()
     {
-        textoPantalla.text = "Tambor vacío. Siguiente ronda...";
+        textoDisparo.text = "Tambor vacío. Siguiente ronda...";
         Invoke("IniciarFaseRecarga", 2f); // Espera 2 segundos y vuelve a cargar
     }
 }

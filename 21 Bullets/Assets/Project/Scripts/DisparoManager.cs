@@ -101,7 +101,7 @@ public class DisparoManager : MonoBehaviour
                 slot.color = Color.white;
             }
         }
-        
+
         ActualizarContadoresTexto(ObtenerRealesRestantes(), ObtenerFogueosRestantes());
     }
 
@@ -130,7 +130,7 @@ public class DisparoManager : MonoBehaviour
 
         if (textoPantalla != null)
         {
-            textoPantalla.text = turnoDelJugadorActual ? "TU TURNO: Elige objetivo" : "TURNO DEL DEALER (Espera...)";
+            textoPantalla.text = turnoDelJugadorActual ? "TU TURNO" : "TURNO DEL DEALER";
         }
 
         if (!turnoDelJugadorActual && dealerIA != null)
@@ -168,12 +168,12 @@ public class DisparoManager : MonoBehaviour
                 if (turnoDelJugadorActual)
                 {
                     SetInteractuable(true);
-                    if (textoPantalla != null) textoPantalla.text = "TU TURNO: Elige objetivo";
+                    if (textoPantalla != null) textoPantalla.text = "TU TURNO";
                 }
                 else
                 {
                     SetInteractuable(false);
-                    if (textoPantalla != null) textoPantalla.text = "TURNO DEL DEALER...";
+                    if (textoPantalla != null) textoPantalla.text = "TURNO DEL DEALER";
                     if (dealerIA != null) dealerIA.IniciarTurno();
                 }
             }
@@ -207,11 +207,6 @@ public class DisparoManager : MonoBehaviour
 
     private IEnumerator EjecutarDisparoDealerRoutine(bool dispararAJugador)
     {
-        if (textoPantalla != null)
-        {
-            textoPantalla.text = dispararAJugador ? "El Dealer te apunta a TI..." : "El Dealer se apunta a SI MISMO...";
-        }
-
         if (component_PistolaMesa != null)
         {
             component_PistolaMesa.sprite = dispararAJugador ? vista_AlJugador : vista_AlDealer;
@@ -230,11 +225,11 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasJugador--;
                 ActualizarCorazonesUI();
-                FinalizarTurno(tamborVacio ? "¡BALA REAL! Recargando revólver..." : "¡BALA REAL!", true);
+                FinalizarTurno(tamborVacio ? "¡BALA REAL" : "¡BALA REAL!", true);
             }
             else
             {
-                FinalizarTurno(tamborVacio ? "¡FOGUEO! Recargando revólver..." : "¡FOGUEO!", true);
+                FinalizarTurno(tamborVacio ? "¡FOGUEO!" : "¡FOGUEO!", true);
             }
         }
         else
@@ -243,12 +238,12 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasDealer--;
                 ActualizarCorazonesUI();
-                FinalizarTurno(tamborVacio ? "¡BALA REAL! El Dealer se ha dañado a si mismo. Tambor vacio." : "¡BALA REAL! El Dealer se ha dañado. Volviendo a las cartas...", true);
+                FinalizarTurno(tamborVacio ? "" : "", true);
             }
             else
             {
                 turnoDelJugadorActual = false;
-                FinalizarTurno(tamborVacio ? "¡FOGUEO! El Dealer se disparo y se salva. Tambor vacio." : "¡FOGUEO! El Dealer se salva y MANTIENE EL TURNO.", false);
+                FinalizarTurno(tamborVacio ? "" : "", false);
             }
         }
     }
@@ -285,12 +280,12 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasJugador--;
                 ActualizarCorazonesUI();
-                FinalizarTurno(tamborVacio ? "¡BALA REAL! Te has dañado. Tambor vacio." : "¡BALA REAL! Te has dañado. Volviendo a las cartas...", true);
+                FinalizarTurno(tamborVacio ? "" : "", true);
             }
             else
             {
                 turnoDelJugadorActual = true;
-                FinalizarTurno(tamborVacio ? "¡FOGUEO! Te salvaste. Tambor vacio." : "¡FOGUEO! Te salvaste. Mantienes el turno.", false);
+                FinalizarTurno(tamborVacio ? "" : "", false);
             }
         }
         else
@@ -299,11 +294,11 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasDealer--;
                 ActualizarCorazonesUI();
-                FinalizarTurno(tamborVacio ? "¡IMPACTO! El Dealer recibe daño. Tambor vacio." : "¡IMPACTO! El Dealer recibe daño. Volviendo a las cartas...", true);
+                FinalizarTurno(tamborVacio ? "" : "", true);
             }
             else
             {
-                FinalizarTurno(tamborVacio ? "¡FOGUEO! El Dealer se salva. Tambor vacio." : "¡FOGUEO! El Dealer se salva. Volviendo a las cartas...", true);
+                FinalizarTurno(tamborVacio ? "" : "", false);
             }
         }
     }
@@ -341,7 +336,7 @@ public class DisparoManager : MonoBehaviour
     private void FinalizarTurno(string mensaje, bool volverACartas)
     {
         volverAFaseCartas = volverACartas;
-        if (textoPantalla != null) textoPantalla.text = mensaje + "\n(Click para continuar)";
+        if (textoPantalla != null) textoPantalla.text = mensaje + "";
         SetInteractuable(false);
         turnoTerminado = true;
     }
