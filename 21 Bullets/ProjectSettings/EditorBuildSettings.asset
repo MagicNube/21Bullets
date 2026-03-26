@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Project/Escenas/01_SPLASH.unity
     guid: d81d2d22b16181d4a9e943d0538ef57c
   - enabled: 1
-    path: Assets/Project/Escenas/Main.unity
+    path: Assets/Project/Escenas/MAIN.unity
     guid: e6af78f15005e3c449813dfed610e6a8
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
