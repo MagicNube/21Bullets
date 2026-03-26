@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,6 +32,10 @@ public class DisparoManager : MonoBehaviour
     private AudioSource audioSource;
     private List<bool> tambor = new List<bool>();
     private int indiceActual = 0;
+
+    private int totalRealesCalculadas = 0;
+    private int totalFogueosCalculadas = 0;
+
     private int vidasJugador = 3;
     private int vidasDealer = 3;
     private bool turnoTerminado = false;
@@ -44,31 +49,64 @@ public class DisparoManager : MonoBehaviour
         vidasDealer = 3;
         ActualizarCorazonesUI();
 
-        if (botonYo != null) 
+        if (botonYo != null)
         {
             botonYo.onClick.RemoveAllListeners();
             botonYo.onClick.AddListener(DispararAYo);
         }
-        
-        if (botonDealer != null) 
+
+        if (botonDealer != null)
         {
             botonDealer.onClick.RemoveAllListeners();
             botonDealer.onClick.AddListener(DispararADealer);
         }
     }
 
+    // NUEVO: Solo calcula la munición. Llamado por FasesManager durante la animación.
+    public void PrepararNuevaRonda()
+    {
+        indiceActual = 0;
+        tambor = new List<bool>();
+
+        totalRealesCalculadas = UnityEngine.Random.Range(2, 5);
+        totalFogueosCalculadas = 6 - totalRealesCalculadas;
+
+        for (int i = 0; i < totalRealesCalculadas; i++) tambor.Add(true);
+        for (int i = 0; i < totalFogueosCalculadas; i++) tambor.Add(false);
+
+        // Barajar el tambor lógico
+        for (int i = 0; i < tambor.Count; i++)
+        {
+            bool temp = tambor[i];
+            int randomIndex = UnityEngine.Random.Range(i, tambor.Count);
+            tambor[i] = tambor[randomIndex];
+            tambor[randomIndex] = temp;
+        }
+
+        // Resetear UI de balas
+        foreach (Image slot in slotsBalas)
+        {
+            if (slot != null)
+            {
+                slot.sprite = spriteBalaDesconocida;
+                slot.color = Color.white;
+            }
+        }
+    }
+
+    public int ObtenerTotalRealesCalculadas() { return totalRealesCalculadas; }
+    public int ObtenerTotalFogueosCalculadas() { return totalFogueosCalculadas; }
+
+    // MODIFICADO: Ya no carga balas, solo inicia el turno porque ya están cargadas
     public void IniciarFase(bool turnoJugador)
     {
         volverAFaseCartas = false;
         turnoDelJugadorActual = turnoJugador;
-        
-        if (tambor.Count == 0 || indiceActual >= tambor.Count)
-        {
-            CargarTambor();
-        }
+
+        ActualizarContadoresTexto(ObtenerRealesRestantes(), ObtenerFogueosRestantes());
 
         SetInteractuable(turnoDelJugadorActual);
-        
+
         if (textoPantalla != null)
         {
             textoPantalla.text = turnoDelJugadorActual ? "TU TURNO: Elige objetivo" : "TURNO DEL DEALER (Espera...)";
@@ -90,6 +128,11 @@ public class DisparoManager : MonoBehaviour
             {
                 if (textoPantalla != null) textoPantalla.text = "FIN DE LA PARTIDA";
             }
+            else if (indiceActual >= tambor.Count)
+            {
+                // Si el tambor está vacío, volvemos a la fase 1 (Recarga)
+                fasesManager.ReiniciarRondaCompleta();
+            }
             else if (volverAFaseCartas)
             {
                 fasesManager.IniciarFaseCartas();
@@ -104,42 +147,11 @@ public class DisparoManager : MonoBehaviour
                 else
                 {
                     SetInteractuable(false);
-                    if (textoPantalla != null) textoPantalla.text = "TURNO DEL DEALER (Espera...)";
+                    if (textoPantalla != null) textoPantalla.text = "TURNO DEL DEALER...";
                     if (dealerIA != null) dealerIA.IniciarTurno();
                 }
             }
         }
-    }
-
-    public void CargarTambor()
-    {
-        indiceActual = 0;
-        tambor = new List<bool>();
-
-        int numReales = Random.Range(2, 5);
-        int numFogueo = 6 - numReales;
-
-        for (int i = 0; i < numReales; i++) tambor.Add(true);
-        for (int i = 0; i < numFogueo; i++) tambor.Add(false);
-
-        for (int i = 0; i < tambor.Count; i++)
-        {
-            bool temp = tambor[i];
-            int randomIndex = Random.Range(i, tambor.Count);
-            tambor[i] = tambor[randomIndex];
-            tambor[randomIndex] = temp;
-        }
-
-        foreach (Image slot in slotsBalas)
-        {
-            if (slot != null)
-            {
-                slot.sprite = spriteBalaDesconocida;
-                slot.color = Color.white;
-            }
-        }
-
-        ActualizarContadoresTexto(numReales, numFogueo);
     }
 
     public int ObtenerRealesRestantes()
@@ -187,11 +199,11 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasJugador--;
                 ActualizarCorazonesUI();
-                FinalizarTurno(tamborVacio ? "¡BALA REAL! El Dealer te ha dañado. Tambor vacio." : "¡BALA REAL! El Dealer te ha dañado. Volviendo a las cartas...", true);
+                FinalizarTurno(tamborVacio ? "¡BALA REAL! Recargando revólver..." : "¡BALA REAL!", true);
             }
             else
             {
-                FinalizarTurno(tamborVacio ? "¡FOGUEO! El Dealer te disparo y fallo. Tambor vacio." : "¡FOGUEO! El Dealer te disparo y fallo. Volviendo a las cartas...", true);
+                FinalizarTurno(tamborVacio ? "¡FOGUEO! Recargando revólver..." : "¡FOGUEO!", true);
             }
         }
         else
@@ -205,7 +217,7 @@ public class DisparoManager : MonoBehaviour
             else
             {
                 turnoDelJugadorActual = false;
-                FinalizarTurno(tamborVacio ? "¡FOGUEO! El Dealer se disparo y se salva. Tambor vacio." : "¡FOGUEO! El Dealer se salva y MANTIENE EL TURNO.", tamborVacio);
+                FinalizarTurno(tamborVacio ? "¡FOGUEO! El Dealer se disparo y se salva. Tambor vacio." : "¡FOGUEO! El Dealer se salva y MANTIENE EL TURNO.", false);
             }
         }
     }
@@ -226,7 +238,7 @@ public class DisparoManager : MonoBehaviour
         else
         {
             turnoDelJugadorActual = true;
-            FinalizarTurno(tamborVacio ? "¡FOGUEO! Te salvaste. Tambor vacio." : "¡FOGUEO! Te salvaste. Mantienes el turno.", tamborVacio);
+            FinalizarTurno(tamborVacio ? "¡FOGUEO! Te salvaste. Tambor vacio." : "¡FOGUEO! Te salvaste. Mantienes el turno.", false);
         }
     }
 
@@ -251,7 +263,7 @@ public class DisparoManager : MonoBehaviour
 
     private bool ComprobarSeguridad()
     {
-        if (tambor == null || tambor.Count == 0 || indiceActual >= tambor.Count)
+        if (tambor == null || tambor.Count == 0 || indiceActual > tambor.Count)
         {
             return false;
         }
@@ -274,6 +286,8 @@ public class DisparoManager : MonoBehaviour
         }
 
         indiceActual++;
+        ActualizarContadoresTexto(ObtenerRealesRestantes(), ObtenerFogueosRestantes());
+
         return esReal;
     }
 
