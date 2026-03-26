@@ -9,6 +9,7 @@ public class DisparoManager : MonoBehaviour
 {
     public FasesManager fasesManager;
     public DealerIANovato dealerIA;
+    public EstacionBalasControl estacionBalas;
 
     [Header("Visuales Pistola")]
     public Image component_PistolaMesa;
@@ -22,13 +23,13 @@ public class DisparoManager : MonoBehaviour
     public Sprite corazonLleno;
     public Sprite corazonVacio;
 
-    public List<Image> slotsBalas;
+    public List<SpriteRenderer> slotsBalas;
     public Image[] corazonesJugador;
     public Image[] corazonesDealer;
 
-    public TextMeshProUGUI textoReales;
-    public TextMeshProUGUI textoFogueo;
-    public TextMeshProUGUI textoPantalla;
+    public TMP_Text textoReales;
+    public TMP_Text textoFogueo;
+    public TMP_Text textoPantalla;
     public Button botonYo;
     public Button botonDealer;
 
@@ -92,7 +93,7 @@ public class DisparoManager : MonoBehaviour
             tambor[randomIndex] = temp;
         }
 
-        foreach (Image slot in slotsBalas)
+        foreach (SpriteRenderer slot in slotsBalas)
         {
             if (slot != null)
             {
@@ -100,6 +101,8 @@ public class DisparoManager : MonoBehaviour
                 slot.color = Color.white;
             }
         }
+        
+        ActualizarContadoresTexto(ObtenerRealesRestantes(), ObtenerFogueosRestantes());
     }
 
     public int ObtenerTotalRealesCalculadas() { return totalRealesCalculadas; }
@@ -116,6 +119,11 @@ public class DisparoManager : MonoBehaviour
         {
             component_PistolaMesa.gameObject.SetActive(true);
             component_PistolaMesa.sprite = vista_Mesa;
+        }
+
+        if (estacionBalas != null)
+        {
+            estacionBalas.Desplegar();
         }
 
         SetInteractuable(turnoDelJugadorActual);
@@ -144,11 +152,13 @@ public class DisparoManager : MonoBehaviour
             else if (indiceActual >= tambor.Count)
             {
                 if (component_PistolaMesa != null) component_PistolaMesa.gameObject.SetActive(false);
+                if (estacionBalas != null) estacionBalas.Ocultar();
                 fasesManager.ReiniciarRondaCompleta();
             }
             else if (volverAFaseCartas)
             {
                 if (component_PistolaMesa != null) component_PistolaMesa.gameObject.SetActive(false);
+                if (estacionBalas != null) estacionBalas.Ocultar();
                 fasesManager.IniciarFaseCartas();
             }
             else
