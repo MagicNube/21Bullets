@@ -2166,7 +2166,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 16
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 199591962acfbfd438b15d81f937bcea, type: 2}
   m_sharedMaterial: {fileID: 3105055372780272444, guid: 199591962acfbfd438b15d81f937bcea, type: 2}
@@ -3380,6 +3380,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fasesManager: {fileID: 786156527}
   dealerIA: {fileID: 1882545229}
+  component_PistolaMesa: {fileID: 0}
+  vista_Mesa: {fileID: 0}
+  vista_AlDealer: {fileID: 0}
+  vista_AlJugador: {fileID: 0}
   spriteBalaReal: {fileID: -4297269366619183174, guid: 8f1f373d6777d2d4c95203f63a6271fb, type: 3}
   spriteBalaFogueo: {fileID: -4747959639797733161, guid: a2c869905adc844408ff4b65fa3a84b2, type: 3}
   spriteBalaDesconocida: {fileID: -1037103393966706096, guid: 2d3d3be6d7c313c4ca84dd33f62af74a, type: 3}
@@ -4891,7 +4895,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 16
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 199591962acfbfd438b15d81f937bcea, type: 2}
   m_sharedMaterial: {fileID: 3105055372780272444, guid: 199591962acfbfd438b15d81f937bcea, type: 2}
