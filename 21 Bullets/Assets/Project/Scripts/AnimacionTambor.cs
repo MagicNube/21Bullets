@@ -23,6 +23,7 @@ public class AnimacionTambor : MonoBehaviour
     public void IniciarSecuencia(int cantidadReales, int cantidadFogueo, Action onAnimacionTerminada)
     {
         gameObject.SetActive(true);
+        transform.localRotation = Quaternion.Euler(0, 0, 0);
         LimpiarBalasViejas();
         StartCoroutine(RutinaAnimacionCarga(cantidadReales, cantidadFogueo, onAnimacionTerminada));
     }
