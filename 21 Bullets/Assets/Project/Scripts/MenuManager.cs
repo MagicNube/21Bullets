@@ -7,12 +7,11 @@ public class MenuManager : MonoBehaviour
     public GameObject panelOpciones;
     public string nombreEscenaJuego;
 
-    public AudioClip sonidoClick; // Arrastra aquí tu sonido de "Roce" o "Click"
+    public AudioClip sonidoClick;
     private AudioSource audioSource;
 
     void Start()
     {
-        // Buscamos o añadimos el AudioSource automáticamente
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
 
@@ -24,23 +23,18 @@ public class MenuManager : MonoBehaviour
 
     public void BotonJugar()
     {
-        // En lugar de cargar directo, lanzamos la secuencia
         StartCoroutine(SecuenciaJugar());
     }
 
     IEnumerator SecuenciaJugar()
     {
-        // 1. Reproducir sonido
         if (sonidoClick != null && audioSource != null)
         {
             audioSource.PlayOneShot(sonidoClick);
         }
 
-        // 2. Esperar (por ejemplo, 0.5 segundos para que se oiga el sonido)
-        // Si tienes un Fade Out, activa la animación aquí y espera lo que dure
         yield return new WaitForSeconds(0.5f);
 
-        // 3. Cargar escena
         SceneManager.LoadScene(nombreEscenaJuego);
     }
 
@@ -56,7 +50,10 @@ public class MenuManager : MonoBehaviour
 
     public void BotonSalir()
     {
-        Debug.Log("Saliendo del juego...");
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
         Application.Quit();
+#endif
     }
 }

@@ -298,7 +298,7 @@ public class DisparoManager : MonoBehaviour
             }
             else
             {
-                FinalizarTurno(tamborVacio ? "" : "", false);
+                FinalizarTurno(tamborVacio ? "" : "", true);
             }
         }
     }
