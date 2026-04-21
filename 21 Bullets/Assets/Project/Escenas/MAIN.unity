@@ -690,9 +690,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 480, y: -60}
-  m_SizeDelta: {x: 960, y: 120}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 960, y: 200}
+  m_Pivot: {x: 0, y: 1}
 --- !u!114 &160428691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2043,6 +2043,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1863482835}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &597952619 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5484363785754977433, guid: 3adc178d606b3824f81359192e5c75b2, type: 3}
+  m_PrefabInstance: {fileID: 1529004407}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &618922967
 GameObject:
   m_ObjectHideFlags: 0
@@ -2129,7 +2134,7 @@ GameObject:
   - component: {fileID: 626930987}
   - component: {fileID: 626930988}
   m_Layer: 5
-  m_Name: Controlador
+  m_Name: ControladorAnimacionVersus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2520,8 +2525,14 @@ MonoBehaviour:
   introManager: {fileID: 626930988}
   textoCartas: {fileID: 1326060427}
   textoDisparo: {fileID: 2032442779}
+  contenedorImagenDealerHUD: {fileID: 597952619}
+  panelHUDJugador: {fileID: 160428689}
+  panelHUDDealer: {fileID: 2046548704}
   spriteProtagonista: {fileID: -4356740979746320664, guid: 5a682afcfe0245841b03af94c9aafa3d, type: 3}
-  spriteRivalInicial: {fileID: -5110711910281351123, guid: 0e7b722ce252a034f9fadd1c9ce78ace, type: 3}
+  listaEnemigos:
+  - {fileID: 11400000, guid: ab72fbefadde7374680b91f33d509c4b, type: 2}
+  - {fileID: 11400000, guid: c82173e061516b44a869eafccee7b12b, type: 2}
+  - {fileID: 11400000, guid: 671f39203cb4ecf4c8a26b4b4e7e5a8e, type: 2}
 --- !u!1 &821117906
 GameObject:
   m_ObjectHideFlags: 0
@@ -3420,11 +3431,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3971572205481728968, guid: 3adc178d606b3824f81359192e5c75b2, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 3971572205481728968, guid: 3adc178d606b3824f81359192e5c75b2, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 140
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 3971572205481728968, guid: 3adc178d606b3824f81359192e5c75b2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3478,6 +3489,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Imagen Jugador
       objectReference: {fileID: 0}
+    - target: {fileID: 5891397387860504734, guid: 3adc178d606b3824f81359192e5c75b2, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -4356740979746320664, guid: 5a682afcfe0245841b03af94c9aafa3d, type: 3}
     - target: {fileID: 5891397387860504734, guid: 3adc178d606b3824f81359192e5c75b2, type: 3}
       propertyPath: m_Color.a
       value: 1
@@ -5638,11 +5653,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3971572205481728968, guid: 3adc178d606b3824f81359192e5c75b2, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 3971572205481728968, guid: 3adc178d606b3824f81359192e5c75b2, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 140
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 3971572205481728968, guid: 3adc178d606b3824f81359192e5c75b2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5699,7 +5714,7 @@ PrefabInstance:
     - target: {fileID: 5891397387860504734, guid: 3adc178d606b3824f81359192e5c75b2, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -114595351847970599, guid: 92f25f62dab35c14c96a9186ee2a3680, type: 3}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7222,11 +7237,11 @@ RectTransform:
   - {fileID: 1529004408}
   m_Father: {fileID: 1072008282}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -480, y: 480}
-  m_SizeDelta: {x: 960, y: 120}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 960, y: 200}
+  m_Pivot: {x: 1, y: 1}
 --- !u!114 &2046548706
 MonoBehaviour:
   m_ObjectHideFlags: 0
