@@ -72,6 +72,15 @@ public class DisparoManager : MonoBehaviour
         }
     }
 
+    // AÑADIDO: Método para ajustar la vida cuando cambia el enemigo
+    public void ResetVidas(int vidasMaximasEnemigo)
+    {
+        vidasDealer = vidasMaximasEnemigo;
+        // Si quieres que el jugador recupere toda su vida al ganar, descomenta la siguiente línea:
+        // vidasJugador = 3;
+        ActualizarCorazonesUI();
+    }
+
     public void PrepararNuevaRonda()
     {
         indiceActual = 0;
@@ -143,9 +152,20 @@ public class DisparoManager : MonoBehaviour
         {
             turnoTerminado = false;
 
-            if (vidasJugador <= 0 || vidasDealer <= 0)
+            // MODIFICADO: Separamos quién ha muerto
+            if (vidasJugador <= 0)
             {
-                if (textoPantalla != null) textoPantalla.text = "FIN DE LA PARTIDA";
+                if (textoPantalla != null) textoPantalla.text = "HAS MUERTO. GAME OVER";
+                // Aquí podrías recargar la escena principal para volver a empezar
+            }
+            else if (vidasDealer <= 0)
+            {
+                if (textoPantalla != null) textoPantalla.text = "¡ENEMIGO DERROTADO!";
+                if (objetoPistola != null) objetoPistola.SetActive(false);
+                if (estacionBalas != null) estacionBalas.Ocultar();
+
+                // Llamamos al Manager General para pasar al siguiente rival
+                fasesManager.VictoriaSobreEnemigo();
             }
             else if (indiceActual >= tambor.Count)
             {

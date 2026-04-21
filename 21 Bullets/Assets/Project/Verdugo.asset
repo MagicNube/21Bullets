@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f7abf5dedefadc4fbec9ee6a78e2437, type: 3}
+  m_Name: Verdugo
+  m_EditorClassIdentifier: 
+  nombre: Verdugo
+  spriteRival: {fileID: 3627130487054926999, guid: 5e2321f54b65b5e47869a78f1f2324c8, type: 3}
+  vidasMaximas: 3
+  umbralPlantadoBlackjack: 17
+  puedeUsarObjetos: 1

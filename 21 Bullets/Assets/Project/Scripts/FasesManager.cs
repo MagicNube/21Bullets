@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class FasesManager : MonoBehaviour
@@ -20,9 +21,16 @@ public class FasesManager : MonoBehaviour
     public TextMeshProUGUI textoCartas;
     public TextMeshProUGUI textoDisparo;
 
-    [Header("Configuración Inicial (Versus)")]
+    public GameObject contenedorImagenDealerHUD;
+
+    [Header("Paneles HUD a Ocultar")]
+    public GameObject panelHUDJugador;
+    public GameObject panelHUDDealer;
+
+    [Header("Configuración de Progresión")]
     public Sprite spriteProtagonista;
-    public Sprite spriteRivalInicial;
+    public EnemigoData[] listaEnemigos;
+    private int indiceEnemigoActual = 0;
 
     private bool juegoIniciado = false;
 
@@ -31,27 +39,69 @@ public class FasesManager : MonoBehaviour
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
         textoCartas.text = "(Click para iniciar)";
-    }
 
-    void Update()
-    {
-        if (!juegoIniciado)
+        if (panelHUDJugador != null) panelHUDJugador.SetActive(false);
+        if (panelHUDDealer != null) panelHUDDealer.SetActive(false);
+
+        if (listaEnemigos != null && listaEnemigos.Length > 0 && contenedorImagenDealerHUD != null)
         {
-            if (Input.GetMouseButtonDown(0))
+            Image img = contenedorImagenDealerHUD.GetComponent<Image>();
+            if (img == null) img = contenedorImagenDealerHUD.GetComponentInChildren<Image>();
+
+            if (img != null)
             {
-                juegoIniciado = true;
-                IniciarFlujoPartida();
+                img.sprite = listaEnemigos[0].spriteRival;
             }
         }
     }
 
-    private void IniciarFlujoPartida()
+    void Update()
+    {
+        if (!juegoIniciado && Input.GetMouseButtonDown(0))
+        {
+            juegoIniciado = true;
+            PrepararSiguienteEnemigo();
+        }
+    }
+
+    public void PrepararSiguienteEnemigo()
+    {
+        if (indiceEnemigoActual < listaEnemigos.Length)
+        {
+            EnemigoData datos = listaEnemigos[indiceEnemigoActual];
+
+            cartasManager.dealerThreshold = datos.umbralPlantadoBlackjack;
+            objetosManager.enemigoRecibeObjetos = datos.puedeUsarObjetos;
+
+            IniciarFlujoPartida(datos);
+        }
+        else
+        {
+            textoCartas.text = "¡HAS SOBREVIVIDO A TODOS!";
+        }
+    }
+
+    private void IniciarFlujoPartida(EnemigoData enemigo)
     {
         textoCartas.text = "";
 
+        if (panelHUDJugador != null) panelHUDJugador.SetActive(false);
+        if (panelHUDDealer != null) panelHUDDealer.SetActive(false);
+
+        if (contenedorImagenDealerHUD != null)
+        {
+            Image img = contenedorImagenDealerHUD.GetComponent<Image>();
+            if (img == null) img = contenedorImagenDealerHUD.GetComponentInChildren<Image>();
+
+            if (img != null)
+            {
+                img.sprite = enemigo.spriteRival;
+            }
+        }
+
         if (introManager != null)
         {
-            introManager.EjecutarAnimacion(spriteProtagonista, spriteRivalInicial);
+            introManager.EjecutarAnimacion(spriteProtagonista, enemigo.spriteRival);
         }
         else
         {
@@ -59,17 +109,23 @@ public class FasesManager : MonoBehaviour
         }
     }
 
+    public void VictoriaSobreEnemigo()
+    {
+        indiceEnemigoActual++;
+        Invoke("PrepararSiguienteEnemigo", 2f);
+    }
+
     public void IniciarFaseRecarga()
     {
+        if (panelHUDJugador != null) panelHUDJugador.SetActive(true);
+        if (panelHUDDealer != null) panelHUDDealer.SetActive(true);
+
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
         textoCartas.text = "";
-
         disparoManager.PrepararNuevaRonda();
-
         int numReales = disparoManager.ObtenerTotalRealesCalculadas();
         int numFogueo = disparoManager.ObtenerTotalFogueosCalculadas();
-
         animacionTambor.IniciarSecuencia(numReales, numFogueo, AlTerminarRecarga);
     }
 
