@@ -12,10 +12,8 @@ public class DisparoManager : MonoBehaviour
     public EstacionBalasControl estacionBalas;
 
     [Header("Visuales Pistola")]
-    public Image component_PistolaMesa;
-    public Sprite vista_Mesa;
-    public Sprite vista_AlDealer;
-    public Sprite vista_AlJugador;
+    public GameObject objetoPistola;
+    public Animator animadorPistola;
 
     public Sprite spriteBalaReal;
     public Sprite spriteBalaFogueo;
@@ -56,9 +54,9 @@ public class DisparoManager : MonoBehaviour
         vidasDealer = 3;
         ActualizarCorazonesUI();
 
-        if (component_PistolaMesa != null)
+        if (objetoPistola != null)
         {
-            component_PistolaMesa.gameObject.SetActive(false);
+            objetoPistola.SetActive(false);
         }
 
         if (botonYo != null)
@@ -115,10 +113,10 @@ public class DisparoManager : MonoBehaviour
 
         ActualizarContadoresTexto(ObtenerRealesRestantes(), ObtenerFogueosRestantes());
 
-        if (component_PistolaMesa != null)
+        if (objetoPistola != null)
         {
-            component_PistolaMesa.gameObject.SetActive(true);
-            component_PistolaMesa.sprite = vista_Mesa;
+            objetoPistola.SetActive(true);
+            if (animadorPistola != null) animadorPistola.Play("Pistola_Reposo");
         }
 
         if (estacionBalas != null)
@@ -151,19 +149,19 @@ public class DisparoManager : MonoBehaviour
             }
             else if (indiceActual >= tambor.Count)
             {
-                if (component_PistolaMesa != null) component_PistolaMesa.gameObject.SetActive(false);
+                if (objetoPistola != null) objetoPistola.SetActive(false);
                 if (estacionBalas != null) estacionBalas.Ocultar();
                 fasesManager.ReiniciarRondaCompleta();
             }
             else if (volverAFaseCartas)
             {
-                if (component_PistolaMesa != null) component_PistolaMesa.gameObject.SetActive(false);
+                if (objetoPistola != null) objetoPistola.SetActive(false);
                 if (estacionBalas != null) estacionBalas.Ocultar();
                 fasesManager.IniciarFaseCartas();
             }
             else
             {
-                if (component_PistolaMesa != null) component_PistolaMesa.sprite = vista_Mesa;
+                if (animadorPistola != null) animadorPistola.Play("Pistola_Reposo");
 
                 if (turnoDelJugadorActual)
                 {
@@ -207,9 +205,9 @@ public class DisparoManager : MonoBehaviour
 
     private IEnumerator EjecutarDisparoDealerRoutine(bool dispararAJugador)
     {
-        if (component_PistolaMesa != null)
+        if (animadorPistola != null)
         {
-            component_PistolaMesa.sprite = dispararAJugador ? vista_AlJugador : vista_AlDealer;
+            animadorPistola.Play(dispararAJugador ? "Pistola_ApuntarJugador" : "Pistola_ApuntarDealer");
         }
 
         yield return new WaitForSeconds(1.5f);
@@ -264,9 +262,9 @@ public class DisparoManager : MonoBehaviour
 
     private IEnumerator RutinaDisparoJugador(bool dispararAJugador)
     {
-        if (component_PistolaMesa != null)
+        if (animadorPistola != null)
         {
-            component_PistolaMesa.sprite = dispararAJugador ? vista_AlJugador : vista_AlDealer;
+            animadorPistola.Play(dispararAJugador ? "Pistola_ApuntarJugador" : "Pistola_ApuntarDealer");
         }
 
         yield return new WaitForSeconds(0.6f);
