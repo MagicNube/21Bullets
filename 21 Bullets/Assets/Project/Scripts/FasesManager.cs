@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -14,12 +16,16 @@ public class FasesManager : MonoBehaviour
     public TextMeshProUGUI textoCartas;
     public TextMeshProUGUI textoDisparo;
 
+    public GameObject panelVersus;
+    public float tiempoMostrarVersus = 2.5f;
+
     private bool juegoIniciado = false;
 
     void Start()
     {
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
+        if (panelVersus != null) panelVersus.SetActive(false);
         textoCartas.text = "(Click para iniciar)";
     }
 
@@ -30,9 +36,22 @@ public class FasesManager : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 juegoIniciado = true;
-                IniciarFaseRecarga();
+                StartCoroutine(SecuenciaVersus());
             }
         }
+    }
+
+    private IEnumerator SecuenciaVersus()
+    {
+        textoCartas.text = "";
+
+        if (panelVersus != null) panelVersus.SetActive(true);
+
+        yield return new WaitForSeconds(tiempoMostrarVersus);
+
+        if (panelVersus != null) panelVersus.SetActive(false);
+
+        IniciarFaseRecarga();
     }
 
     public void IniciarFaseRecarga()
