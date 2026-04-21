@@ -5,19 +5,24 @@ using TMPro;
 
 public class FasesManager : MonoBehaviour
 {
+    [Header("Contenedores de Fase")]
     public GameObject contenedorCartas;
     public GameObject contenedorDisparo;
 
+    [Header("Managers")]
     public CartasManager cartasManager;
     public DisparoManager disparoManager;
     public AnimacionTambor animacionTambor;
     public ObjetosManager objetosManager;
+    public IntroAnimacionManager introManager;
 
+    [Header("UI y Textos")]
     public TextMeshProUGUI textoCartas;
     public TextMeshProUGUI textoDisparo;
 
-    public GameObject panelVersus;
-    public float tiempoMostrarVersus = 2.5f;
+    [Header("Configuración Inicial (Versus)")]
+    public Sprite spriteProtagonista;
+    public Sprite spriteRivalInicial;
 
     private bool juegoIniciado = false;
 
@@ -25,7 +30,6 @@ public class FasesManager : MonoBehaviour
     {
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
-        if (panelVersus != null) panelVersus.SetActive(false);
         textoCartas.text = "(Click para iniciar)";
     }
 
@@ -36,22 +40,23 @@ public class FasesManager : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 juegoIniciado = true;
-                StartCoroutine(SecuenciaVersus());
+                IniciarFlujoPartida();
             }
         }
     }
 
-    private IEnumerator SecuenciaVersus()
+    private void IniciarFlujoPartida()
     {
         textoCartas.text = "";
 
-        if (panelVersus != null) panelVersus.SetActive(true);
-
-        yield return new WaitForSeconds(tiempoMostrarVersus);
-
-        if (panelVersus != null) panelVersus.SetActive(false);
-
-        IniciarFaseRecarga();
+        if (introManager != null)
+        {
+            introManager.EjecutarAnimacion(spriteProtagonista, spriteRivalInicial);
+        }
+        else
+        {
+            IniciarFaseRecarga();
+        }
     }
 
     public void IniciarFaseRecarga()
