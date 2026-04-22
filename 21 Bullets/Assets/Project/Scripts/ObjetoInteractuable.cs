@@ -11,7 +11,8 @@ public class ObjetoInteractuable : MonoBehaviour
 
     private SpriteRenderer sr;
     private Color colorOriginal;
-    private Color colorTransparente;
+    
+    public bool esUsable = true;
 
     private Coroutine rutinaHover;
     private readonly float tiempoHover = 0.3f;
@@ -25,16 +26,26 @@ public class ObjetoInteractuable : MonoBehaviour
         if (sr != null)
         {
             colorOriginal = sr.color;
-            colorTransparente = new Color(colorOriginal.r, colorOriginal.g, colorOriginal.b, 0.5f);
+        }
+    }
+
+    public void SetActivo(bool activo)
+    {
+        if (esUsable == activo) return;
+        esUsable = activo;
+        
+        if (sr != null)
+        {
+            Color c = colorOriginal;
+            if (!activo) c.a = 0.3f; 
+            sr.color = c;
         }
     }
 
     void OnMouseEnter()
     {
-        if (!arrastrando)
-        {
-            rutinaHover = StartCoroutine(RutinaMostrarTooltip());
-        }
+        if (!esUsable || arrastrando) return;
+        rutinaHover = StartCoroutine(RutinaMostrarTooltip());
     }
 
     void OnMouseExit()
@@ -53,7 +64,6 @@ public class ObjetoInteractuable : MonoBehaviour
     private IEnumerator RutinaMostrarTooltip()
     {
         yield return new WaitForSeconds(tiempoHover);
-
         string descripcion = ObtenerDescripcion(miTipo);
         NotificacionManager.Instance.MostrarMensaje(descripcion, false);
     }
@@ -78,6 +88,7 @@ public class ObjetoInteractuable : MonoBehaviour
 
     void OnMouseDown()
     {
+        if (!esUsable) return;
         if (manager != null && manager.objetoCajaVisual != null && manager.objetoCajaVisual.activeSelf) return;
 
         if (rutinaHover != null)
@@ -90,43 +101,36 @@ public class ObjetoInteractuable : MonoBehaviour
         posicionInicialSlot = transform.position;
         arrastrando = true;
 
-        if (sr != null) sr.color = colorTransparente;
-
-        if (manager != null && manager.cursorManoCerrada != null)
+        if (manager != null)
         {
-            Cursor.SetCursor(manager.cursorManoCerrada, Vector2.zero, CursorMode.Auto);
+            if (manager.cursorManoCerrada != null)
+            {
+                Cursor.SetCursor(manager.cursorManoCerrada, Vector2.zero, CursorMode.Auto);
+            }
+            manager.ResaltarZonasValidas(miTipo, true);
         }
     }
 
     void OnMouseDrag()
     {
-        if (arrastrando)
-        {
-            Vector3 posRaton = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            posRaton.z = transform.position.z;
-            transform.position = posRaton;
+        if (!esUsable || !arrastrando) return;
 
-            if (manager != null)
-            {
-                bool enZonaValida = manager.ComprobarZonaValida(miTipo, transform.position);
-                if (sr != null) sr.color = enZonaValida ? colorOriginal : colorTransparente;
-            }
-        }
+        Vector3 posRaton = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        posRaton.z = transform.position.z;
+        transform.position = posRaton;
     }
 
     void OnMouseUp()
     {
         if (!arrastrando) return;
-
         arrastrando = false;
 
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
 
-        if (sr != null) sr.color = colorOriginal;
-
         bool exito = false;
         if (manager != null)
         {
+            manager.ResaltarZonasValidas(miTipo, false);
             exito = manager.IntentarUsarObjetoJugador(this);
         }
 

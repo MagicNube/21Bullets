@@ -61,6 +61,56 @@ public class ObjetosManager : MonoBehaviour
         {
             esperandoClickCaja = false;
         }
+
+        ActualizarEstadoTransparenciaObjetos();
+    }
+
+    private void ActualizarEstadoTransparenciaObjetos()
+    {
+        bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
+        bool enFaseDisparo = fasesManager.contenedorDisparo.activeSelf;
+        bool esMiTurno = (enFaseCartas && cartasManager.isPlayerTurn) || (enFaseDisparo && disparoManager.turnoDelJugadorActual);
+
+        for (int i = 0; i < objetosJugador.Length; i++)
+        {
+            if (objetosJugador[i] != null)
+            {
+                ObjetoInteractuable oi = objetosJugador[i].GetComponent<ObjetoInteractuable>();
+                if (oi != null)
+                {
+                    bool usable = esMiTurno;
+                    if (usable)
+                    {
+                        switch (oi.miTipo)
+                        {
+                            case TipoObjeto.Tijeras:
+                            case TipoObjeto.RayosX: 
+                                usable = enFaseCartas; 
+                                break;
+                            case TipoObjeto.Polvora:
+                            case TipoObjeto.Inversor:
+                            case TipoObjeto.Muñeco:
+                            case TipoObjeto.Esposas: 
+                                usable = enFaseDisparo; 
+                                break;
+                        }
+                    }
+                    oi.SetActivo(usable);
+                }
+            }
+        }
+    }
+
+    public void LimpiarTodosLosObjetos()
+    {
+        for (int i = 0; i < objetosJugador.Length; i++)
+        {
+            if (objetosJugador[i] != null) { Destroy(objetosJugador[i]); objetosJugador[i] = null; }
+        }
+        for (int i = 0; i < objetosDealer.Length; i++)
+        {
+            if (objetosDealer[i] != null) { Destroy(objetosDealer[i]); objetosDealer[i] = null; }
+        }
     }
 
     public void RepartirObjetosRonda(Action onTerminado)
@@ -191,6 +241,63 @@ public class ObjetosManager : MonoBehaviour
         objAnim.transform.SetParent(destino);
     }
 
+    public void ResaltarZonasValidas(TipoObjeto tipo, bool resaltar)
+    {
+        List<GameObject> objetivos = new List<GameObject>();
+        bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
+        bool enFaseDisparo = fasesManager.contenedorDisparo.activeSelf;
+
+        switch (tipo)
+        {
+            case TipoObjeto.Lupa:
+                if (enFaseCartas && cartasManager.deckTransform != null) objetivos.Add(cartasManager.deckTransform.gameObject);
+                if (enFaseDisparo && disparoManager.objetoPistola != null) objetivos.Add(disparoManager.objetoPistola);
+                break;
+            case TipoObjeto.Polvora:
+            case TipoObjeto.Inversor:
+            case TipoObjeto.Muñeco:
+                if (enFaseDisparo && disparoManager.objetoPistola != null) objetivos.Add(disparoManager.objetoPistola);
+                break;
+            case TipoObjeto.Botiquin:
+            case TipoObjeto.Telefono:
+                if (posicionCajaJugador != null) objetivos.Add(posicionCajaJugador.gameObject);
+                break;
+            case TipoObjeto.Esposas:
+                if (enFaseDisparo && posicionCajaDealer != null) objetivos.Add(posicionCajaDealer.gameObject);
+                break;
+            case TipoObjeto.Tijeras:
+                if (enFaseCartas) {
+                    foreach (var card in cartasManager.playerCards) {
+                        if (card != null) objetivos.Add(card);
+                    }
+                }
+                break;
+            case TipoObjeto.RayosX:
+                if (enFaseCartas) {
+                    GameObject oculta = cartasManager.ObtenerCartaOculta();
+                    if (oculta != null) objetivos.Add(oculta);
+                }
+                break;
+            case TipoObjeto.Guante:
+                foreach (var obj in objetosDealer) {
+                    if (obj != null) objetivos.Add(obj);
+                }
+                break;
+        }
+
+        foreach (GameObject obj in objetivos)
+        {
+            if (obj == null) continue;
+            
+            if (resaltar) {
+                if (obj.GetComponent<EfectoLatido>() == null) obj.AddComponent<EfectoLatido>();
+            } else {
+                EfectoLatido latido = obj.GetComponent<EfectoLatido>();
+                if (latido != null) Destroy(latido);
+            }
+        }
+    }
+
     public bool ComprobarZonaValida(TipoObjeto tipo, Vector3 posicionObjeto)
     {
         bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
@@ -259,6 +366,16 @@ public class ObjetosManager : MonoBehaviour
 
         if (!ComprobarZonaValida(obj.miTipo, obj.transform.position)) return false;
 
+        int indexSlot = -1;
+        for (int i = 0; i < objetosJugador.Length; i++)
+        {
+            if (objetosJugador[i] == obj.gameObject)
+            {
+                indexSlot = i;
+                break;
+            }
+        }
+
         bool usado = false;
 
         switch (obj.miTipo)
@@ -292,12 +409,16 @@ public class ObjetosManager : MonoBehaviour
                 usado = disparoManager.UsarTelefono(); 
                 break;
             case TipoObjeto.Guante:
-                usado = UsarGuante(obj.transform.position);
+                usado = UsarGuante(obj.transform.position, indexSlot);
                 break;
         }
 
         if (usado)
         {
+            if (obj.miTipo != TipoObjeto.Guante && indexSlot != -1)
+            {
+                objetosJugador[indexSlot] = null;
+            }
             Destroy(obj.gameObject);
             return true;
         }
@@ -305,7 +426,7 @@ public class ObjetosManager : MonoBehaviour
         return false;
     }
 
-    private bool UsarGuante(Vector3 dropPos)
+    private bool UsarGuante(Vector3 dropPos, int slotJugadorOrigen)
     {
         int closestIndex = -1;
         float minDistance = float.MaxValue;
@@ -325,12 +446,7 @@ public class ObjetosManager : MonoBehaviour
 
         if (closestIndex != -1 && minDistance <= distanciaInteraccion)
         {
-            int slotJugadorLibre = ObtenerSlotLibre(objetosJugador);
-            if (slotJugadorLibre == -1)
-            {
-                NotificacionManager.Instance.MostrarMensaje("Inventario lleno. No puedes robar.", true, 2f);
-                return false;
-            }
+            if (slotJugadorOrigen == -1) return false;
 
             TipoObjeto tipoRobado = tiposDealer[closestIndex];
 
@@ -338,9 +454,9 @@ public class ObjetosManager : MonoBehaviour
             objetosDealer[closestIndex] = null;
 
             GameObject objAnim = Instantiate(prefabObjetoAnimacion, slotsDealer[closestIndex].position, Quaternion.identity);
-            objetosJugador[slotJugadorLibre] = objAnim;
+            objetosJugador[slotJugadorOrigen] = objAnim; 
 
-            StartCoroutine(AnimarObjetoVolando(objAnim, tipoRobado, slotsJugador[slotJugadorLibre], slotsDealer[closestIndex].position, true));
+            StartCoroutine(AnimarObjetoVolando(objAnim, tipoRobado, slotsJugador[slotJugadorOrigen], slotsDealer[closestIndex].position, true));
 
             NotificacionManager.Instance.MostrarMensaje("¡Has robado un objeto!", true, 2f);
             return true;

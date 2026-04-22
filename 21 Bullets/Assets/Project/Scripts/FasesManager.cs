@@ -98,6 +98,13 @@ public class FasesManager : MonoBehaviour
             }
         }
 
+        // LIMPIAR OBJETOS Y VIDAS AL CAMBIAR DE ENEMIGO
+        disparoManager.ResetPartidaCompleta(enemigo.vidasMaximas);
+        if (objetosManager != null)
+        {
+            objetosManager.LimpiarTodosLosObjetos();
+        }
+
         if (introManager != null)
         {
             introManager.EjecutarAnimacion(spriteProtagonista, enemigo.spriteRival);

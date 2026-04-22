@@ -70,10 +70,20 @@ public class DisparoManager : MonoBehaviour
         }
     }
 
-    public void ResetVidas(int vidasMaximasEnemigo)
+    public void ResetPartidaCompleta(int vidasMaximasEnemigo)
     {
+        vidasJugador = corazonesJugador.Length;
         vidasDealer = vidasMaximasEnemigo;
         ActualizarCorazonesUI();
+        
+        tambor.Clear();
+        indiceActual = 0;
+        polvoraActiva = false;
+        esposasActivas = false;
+        turnoTerminado = false;
+        volverAFaseCartas = false;
+        
+        ActualizarContadoresTexto(0, 0);
     }
 
     public void PrepararNuevaRonda()
@@ -378,8 +388,6 @@ public class DisparoManager : MonoBehaviour
         if (botonYo != null) botonYo.interactable = estado;
         if (botonDealer != null) botonDealer.interactable = estado;
     }
-
-    // --- MÉTODOS DE OBJETOS ---
 
     public bool UsarLupa()
     {

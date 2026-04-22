@@ -424,6 +424,23 @@ public class CartasManager : MonoBehaviour
         }
     }
 
+    public void ResaltarCartaOculta(bool resaltar)
+    {
+        if (dealerHiddenCardRenderer != null && !dealerCardRevealed)
+        {
+            dealerHiddenCardRenderer.color = resaltar ? new Color(1f, 0.9f, 0.3f) : Color.white;
+        }
+    }
+
+    public GameObject ObtenerCartaOculta()
+    {
+        if (dealerHiddenCardRenderer != null && !dealerCardRevealed)
+        {
+            return dealerHiddenCardRenderer.gameObject;
+        }
+        return null;
+    }
+
     public bool UsarRayosX()
     {
         if (dealerHiddenCardRenderer == null || dealerCardRevealed) return false;
