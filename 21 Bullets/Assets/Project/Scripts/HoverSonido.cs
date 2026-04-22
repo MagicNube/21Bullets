@@ -8,7 +8,6 @@ public class HoverSonido : MonoBehaviour, IPointerEnterHandler
 
     void Start()
     {
-        // Buscamos el AudioSource en el objeto MANAGERS para centralizar el audio
         audioSource = GameObject.Find("MANAGERS").GetComponent<AudioSource>();
 
         if (audioSource == null)

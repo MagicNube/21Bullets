@@ -2,43 +2,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class FasesManager : MonoBehaviour
 {
-    [Header("Contenedores de Fase")]
     public GameObject contenedorCartas;
     public GameObject contenedorDisparo;
 
-    [Header("Managers")]
     public CartasManager cartasManager;
     public DisparoManager disparoManager;
     public AnimacionTambor animacionTambor;
     public ObjetosManager objetosManager;
     public IntroAnimacionManager introManager;
 
-    [Header("UI y Textos")]
-    public TextMeshProUGUI textoCartas;
-    public TextMeshProUGUI textoDisparo;
-
     public GameObject contenedorImagenDealerHUD;
 
-    [Header("Paneles HUD a Ocultar")]
     public GameObject panelHUDJugador;
     public GameObject panelHUDDealer;
 
-    [Header("Configuración de Progresión")]
     public Sprite spriteProtagonista;
     public EnemigoData[] listaEnemigos;
     private int indiceEnemigoActual = 0;
 
     private bool juegoIniciado = false;
+    private bool primerMensajeCartasMostrado = false;
 
     void Start()
     {
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
-        textoCartas.text = "(Click para iniciar)";
+        
+        NotificacionManager.Instance.MostrarMensaje("(Click para iniciar)", false);
 
         if (panelHUDJugador != null) panelHUDJugador.SetActive(false);
         if (panelHUDDealer != null) panelHUDDealer.SetActive(false);
@@ -71,19 +64,25 @@ public class FasesManager : MonoBehaviour
             EnemigoData datos = listaEnemigos[indiceEnemigoActual];
 
             cartasManager.dealerThreshold = datos.umbralPlantadoBlackjack;
-            objetosManager.enemigoRecibeObjetos = datos.puedeUsarObjetos;
+            
+            if (objetosManager != null)
+            {
+                objetosManager.enemigoRecibeObjetos = datos.puedeUsarObjetos;
+            }
+
+            primerMensajeCartasMostrado = false;
 
             IniciarFlujoPartida(datos);
         }
         else
         {
-            textoCartas.text = "¡HAS SOBREVIVIDO A TODOS!";
+            NotificacionManager.Instance.MostrarMensaje("¡HAS SOBREVIVIDO A TODOS!", false);
         }
     }
 
     private void IniciarFlujoPartida(EnemigoData enemigo)
     {
-        textoCartas.text = "";
+        NotificacionManager.Instance.OcultarMensaje();
 
         if (panelHUDJugador != null) panelHUDJugador.SetActive(false);
         if (panelHUDDealer != null) panelHUDDealer.SetActive(false);
@@ -122,7 +121,8 @@ public class FasesManager : MonoBehaviour
 
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
-        textoCartas.text = "";
+        NotificacionManager.Instance.OcultarMensaje();
+        
         disparoManager.PrepararNuevaRonda();
         int numReales = disparoManager.ObtenerTotalRealesCalculadas();
         int numFogueo = disparoManager.ObtenerTotalFogueosCalculadas();
@@ -143,16 +143,25 @@ public class FasesManager : MonoBehaviour
 
     public void IniciarFaseCartas()
     {
-        textoDisparo.text = "";
         contenedorDisparo.SetActive(false);
         contenedorCartas.SetActive(true);
-        textoCartas.text = "Gana la mano para tener el primer turno.";
+        
+        if (!primerMensajeCartasMostrado)
+        {
+            NotificacionManager.Instance.MostrarMensaje("Gana la mano para tener el primer turno.", true, 3f);
+            primerMensajeCartasMostrado = true;
+        }
+        else
+        {
+            NotificacionManager.Instance.OcultarMensaje();
+        }
+        
         cartasManager.ResetSequence();
     }
 
     public void IniciarFaseDisparo(bool ganaJugador)
     {
-        textoCartas.text = "";
+        NotificacionManager.Instance.OcultarMensaje();
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(true);
         disparoManager.IniciarFase(ganaJugador);
@@ -160,7 +169,7 @@ public class FasesManager : MonoBehaviour
 
     public void ReiniciarRondaCompleta()
     {
-        textoDisparo.text = "Tambor vacío. Siguiente ronda...";
+        NotificacionManager.Instance.MostrarMensaje("Tambor vacío. Siguiente ronda...", true, 2f);
         Invoke("IniciarFaseRecarga", 2f);
     }
 }

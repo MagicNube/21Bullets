@@ -27,7 +27,6 @@ public class DisparoManager : MonoBehaviour
 
     public TMP_Text textoReales;
     public TMP_Text textoFogueo;
-    public TMP_Text textoPantalla;
     public Button botonYo;
     public Button botonDealer;
 
@@ -72,12 +71,9 @@ public class DisparoManager : MonoBehaviour
         }
     }
 
-    // AÑADIDO: Método para ajustar la vida cuando cambia el enemigo
     public void ResetVidas(int vidasMaximasEnemigo)
     {
         vidasDealer = vidasMaximasEnemigo;
-        // Si quieres que el jugador recupere toda su vida al ganar, descomenta la siguiente línea:
-        // vidasJugador = 3;
         ActualizarCorazonesUI();
     }
 
@@ -135,10 +131,7 @@ public class DisparoManager : MonoBehaviour
 
         SetInteractuable(turnoDelJugadorActual);
 
-        if (textoPantalla != null)
-        {
-            textoPantalla.text = turnoDelJugadorActual ? "TU TURNO" : "TURNO DEL DEALER";
-        }
+        NotificacionManager.Instance.MostrarMensaje(turnoDelJugadorActual ? "TU TURNO" : "TURNO DEL DEALER", true, 2.5f);
 
         if (!turnoDelJugadorActual && dealerIA != null)
         {
@@ -152,19 +145,16 @@ public class DisparoManager : MonoBehaviour
         {
             turnoTerminado = false;
 
-            // MODIFICADO: Separamos quién ha muerto
             if (vidasJugador <= 0)
             {
-                if (textoPantalla != null) textoPantalla.text = "HAS MUERTO. GAME OVER";
-                // Aquí podrías recargar la escena principal para volver a empezar
+                NotificacionManager.Instance.MostrarMensaje("HAS MUERTO. GAME OVER", false);
             }
             else if (vidasDealer <= 0)
             {
-                if (textoPantalla != null) textoPantalla.text = "¡ENEMIGO DERROTADO!";
+                NotificacionManager.Instance.MostrarMensaje("¡ENEMIGO DERROTADO!", true, 2.5f);
                 if (objetoPistola != null) objetoPistola.SetActive(false);
                 if (estacionBalas != null) estacionBalas.Ocultar();
 
-                // Llamamos al Manager General para pasar al siguiente rival
                 fasesManager.VictoriaSobreEnemigo();
             }
             else if (indiceActual >= tambor.Count)
@@ -186,12 +176,12 @@ public class DisparoManager : MonoBehaviour
                 if (turnoDelJugadorActual)
                 {
                     SetInteractuable(true);
-                    if (textoPantalla != null) textoPantalla.text = "TU TURNO";
+                    NotificacionManager.Instance.MostrarMensaje("TU TURNO", true, 2.5f);
                 }
                 else
                 {
                     SetInteractuable(false);
-                    if (textoPantalla != null) textoPantalla.text = "TURNO DEL DEALER";
+                    NotificacionManager.Instance.MostrarMensaje("TURNO DEL DEALER", true, 2.5f);
                     if (dealerIA != null) dealerIA.IniciarTurno();
                 }
             }
@@ -256,12 +246,12 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasDealer--;
                 ActualizarCorazonesUI();
-                FinalizarTurno(tamborVacio ? "" : "", true);
+                FinalizarTurno(tamborVacio ? "¡BALA REAL!" : "¡BALA REAL!", true);
             }
             else
             {
                 turnoDelJugadorActual = false;
-                FinalizarTurno(tamborVacio ? "" : "", false);
+                FinalizarTurno(tamborVacio ? "¡FOGUEO!" : "¡FOGUEO!", false);
             }
         }
     }
@@ -298,12 +288,12 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasJugador--;
                 ActualizarCorazonesUI();
-                FinalizarTurno(tamborVacio ? "" : "", true);
+                FinalizarTurno(tamborVacio ? "¡BALA REAL!" : "¡BALA REAL!", true);
             }
             else
             {
                 turnoDelJugadorActual = true;
-                FinalizarTurno(tamborVacio ? "" : "", false);
+                FinalizarTurno(tamborVacio ? "¡FOGUEO!" : "¡FOGUEO!", false);
             }
         }
         else
@@ -312,11 +302,11 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasDealer--;
                 ActualizarCorazonesUI();
-                FinalizarTurno(tamborVacio ? "" : "", true);
+                FinalizarTurno(tamborVacio ? "¡BALA REAL!" : "¡BALA REAL!", true);
             }
             else
             {
-                FinalizarTurno(tamborVacio ? "" : "", true);
+                FinalizarTurno(tamborVacio ? "¡FOGUEO!" : "¡FOGUEO!", true);
             }
         }
     }
@@ -354,7 +344,7 @@ public class DisparoManager : MonoBehaviour
     private void FinalizarTurno(string mensaje, bool volverACartas)
     {
         volverAFaseCartas = volverACartas;
-        if (textoPantalla != null) textoPantalla.text = mensaje + "";
+        NotificacionManager.Instance.MostrarMensaje(mensaje + "\n(Click para continuar)", false);
         SetInteractuable(false);
         turnoTerminado = true;
     }
@@ -384,5 +374,14 @@ public class DisparoManager : MonoBehaviour
     {
         if (botonYo != null) botonYo.interactable = estado;
         if (botonDealer != null) botonDealer.interactable = estado;
+    }
+
+    public bool UsarLupa()
+    {
+        if (!turnoDelJugadorActual || indiceActual >= tambor.Count) return false;
+
+        bool esReal = tambor[indiceActual];
+        NotificacionManager.Instance.MostrarMensaje(esReal ? "Lupa: La siguiente bala es REAL" : "Lupa: La siguiente bala es FOGUEO", true, 3.5f);
+        return true;
     }
 }

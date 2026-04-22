@@ -40,7 +40,6 @@ public class CartasManager : MonoBehaviour
 
     public TextMeshProUGUI textoPuntosJugador;
     public TextMeshProUGUI textoPuntosDealer;
-    public TextMeshProUGUI textoInformacion;
 
     public AudioClip sonidoRepartirCarta;
 
@@ -93,7 +92,6 @@ public class CartasManager : MonoBehaviour
 
         if (textoPuntosJugador != null) textoPuntosJugador.text = "0";
         if (textoPuntosDealer != null) textoPuntosDealer.text = "0";
-        if (textoInformacion != null) textoInformacion.text = "";
 
         InitializeDeck();
         StartCoroutine(DealInitialCardsRoutine());
@@ -303,7 +301,7 @@ public class CartasManager : MonoBehaviour
         if (playerScore > 21)
         {
             isPlayerTurn = false;
-            if (textoInformacion != null) textoInformacion.text = "El Dealer gana.";
+            NotificacionManager.Instance.MostrarMensaje("Te pasaste. El Dealer gana.", true, 2.5f);
             yield return new WaitForSeconds(2.5f);
             fasesManager.IniciarFaseDisparo(false);
         }
@@ -346,25 +344,25 @@ public class CartasManager : MonoBehaviour
 
         if (dealerScore > 21)
         {
-            if (textoInformacion != null) textoInformacion.text = "¡El Dealer se ha pasado!";
+            NotificacionManager.Instance.MostrarMensaje("¡El Dealer se ha pasado!", true, 2.5f);
             yield return new WaitForSeconds(2.5f);
             fasesManager.IniciarFaseDisparo(true);
         }
         else if (playerScore > dealerScore)
         {
-            if (textoInformacion != null) textoInformacion.text = "¡Ganas por puntos! ";
+            NotificacionManager.Instance.MostrarMensaje("¡Ganas por puntos!", true, 2.5f);
             yield return new WaitForSeconds(2.5f);
             fasesManager.IniciarFaseDisparo(true);
         }
         else if (dealerScore > playerScore)
         {
-            if (textoInformacion != null) textoInformacion.text = "El Dealer gana.";
+            NotificacionManager.Instance.MostrarMensaje("El Dealer gana.", true, 2.5f);
             yield return new WaitForSeconds(2.5f);
             fasesManager.IniciarFaseDisparo(false);
         }
         else
         {
-            if (textoInformacion != null) textoInformacion.text = "¡Empate!";
+            NotificacionManager.Instance.MostrarMensaje("¡Empate!", true, 2.5f);
             yield return new WaitForSeconds(2.5f);
             fasesManager.IniciarFaseCartas();
         }
@@ -420,5 +418,42 @@ public class CartasManager : MonoBehaviour
         }
 
         return totalValue;
+    }
+
+    public bool UsarTijeras()
+    {
+        if (!isPlayerTurn || playerCards.Count == 0) return false;
+
+        GameObject lastCard = playerCards[playerCards.Count - 1];
+        playerCards.RemoveAt(playerCards.Count - 1);
+        playerHandIndices.RemoveAt(playerHandIndices.Count - 1);
+        Destroy(lastCard);
+
+        ActualizarPuntuacionUI();
+        NotificacionManager.Instance.MostrarMensaje("Has cortado tu ultima carta.", true, 2.5f);
+        return true;
+    }
+
+    public bool UsarRayosX()
+    {
+        if (!isPlayerTurn || dealerHiddenCardRenderer == null || dealerCardRevealed) return false;
+
+        dealerHiddenCardRenderer.sprite = deckData[dealerHiddenCardIndex].cardSprite;
+        NotificacionManager.Instance.MostrarMensaje("Carta oculta revelada.", true, 2.5f);
+        return true;
+    }
+
+    public bool UsarLupa()
+    {
+        if (!isPlayerTurn || deck.Count == 0) return false;
+
+        int nextCardIndex = deck[0];
+        CardData nextCard = deckData[nextCardIndex];
+        
+        string valor = nextCard.cardValue.ToString();
+        if (nextCard.isAce) valor = "As (11 o 1)";
+
+        NotificacionManager.Instance.MostrarMensaje("Siguiente en mazo: " + valor, true, 3.5f);
+        return true;
     }
 }
