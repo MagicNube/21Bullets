@@ -16,7 +16,6 @@ public class CardData
 public class CartasManager : MonoBehaviour
 {
     public FasesManager fasesManager;
-
     public Sprite[] allCardSprites;
 
     [HideInInspector]
@@ -40,17 +39,17 @@ public class CartasManager : MonoBehaviour
 
     public TextMeshProUGUI textoPuntosJugador;
     public TextMeshProUGUI textoPuntosDealer;
-
     public AudioClip sonidoRepartirCarta;
 
     private List<int> deck = new List<int>();
-    private List<GameObject> playerCards = new List<GameObject>();
+    
+    public List<GameObject> playerCards = new List<GameObject>();
     private List<GameObject> dealerCards = new List<GameObject>();
 
     private List<int> playerHandIndices = new List<int>();
     private List<int> dealerHandIndices = new List<int>();
 
-    private bool isPlayerTurn = false;
+    public bool isPlayerTurn = false;
     private SpriteRenderer dealerHiddenCardRenderer;
     private int dealerHiddenCardIndex;
     private bool dealerCardRevealed = false;
@@ -60,7 +59,6 @@ public class CartasManager : MonoBehaviour
     void Awake()
     {
         audioSource = GetComponent<AudioSource>();
-
         if (hitButton != null) hitButton.onClick.AddListener(OnHitClicked);
         if (standButton != null) standButton.onClick.AddListener(OnStandClicked);
     }
@@ -69,14 +67,8 @@ public class CartasManager : MonoBehaviour
     {
         StopAllCoroutines();
 
-        foreach (GameObject card in playerCards)
-        {
-            Destroy(card);
-        }
-        foreach (GameObject card in dealerCards)
-        {
-            Destroy(card);
-        }
+        foreach (GameObject card in playerCards) Destroy(card);
+        foreach (GameObject card in dealerCards) Destroy(card);
 
         playerCards.Clear();
         dealerCards.Clear();
@@ -104,24 +96,11 @@ public class CartasManager : MonoBehaviour
         {
             CardData newCard = new CardData();
             newCard.cardSprite = allCardSprites[i];
-
             int rank = (i % 13) + 1;
 
-            if (rank == 1)
-            {
-                newCard.isAce = true;
-                newCard.cardValue = 11;
-            }
-            else if (rank > 10)
-            {
-                newCard.isAce = false;
-                newCard.cardValue = 10;
-            }
-            else
-            {
-                newCard.isAce = false;
-                newCard.cardValue = rank;
-            }
+            if (rank == 1) { newCard.isAce = true; newCard.cardValue = 11; }
+            else if (rank > 10) { newCard.isAce = false; newCard.cardValue = 10; }
+            else { newCard.isAce = false; newCard.cardValue = rank; }
 
             deckData.Add(newCard);
         }
@@ -131,10 +110,7 @@ public class CartasManager : MonoBehaviour
     {
         AutoBuildDeck();
         deck.Clear();
-        for (int i = 0; i < deckData.Count; i++)
-        {
-            deck.Add(i);
-        }
+        for (int i = 0; i < deckData.Count; i++) deck.Add(i);
         ShuffleDeck();
     }
 
@@ -153,13 +129,10 @@ public class CartasManager : MonoBehaviour
     {
         yield return StartCoroutine(DrawCardRoutine(playerHandContainer, playerCards, playerHandIndices, true, false));
         yield return new WaitForSeconds(delayBetweenCards);
-
         yield return StartCoroutine(DrawCardRoutine(dealerHandContainer, dealerCards, dealerHandIndices, true, false));
         yield return new WaitForSeconds(delayBetweenCards);
-
         yield return StartCoroutine(DrawCardRoutine(playerHandContainer, playerCards, playerHandIndices, true, false));
         yield return new WaitForSeconds(delayBetweenCards);
-
         yield return StartCoroutine(DrawCardRoutine(dealerHandContainer, dealerCards, dealerHandIndices, false, true));
 
         isPlayerTurn = true;
@@ -192,10 +165,7 @@ public class CartasManager : MonoBehaviour
         for (int i = 0; i < totalCards; i++)
         {
             targetPositions[i] = new Vector3(startX + (i * cardSpacing), 0, 0);
-            if (i < totalCards - 1)
-            {
-                startPositions[i] = handList[i].transform.localPosition;
-            }
+            if (i < totalCards - 1) startPositions[i] = handList[i].transform.localPosition;
         }
 
         cardTransform.localPosition = targetPositions[totalCards - 1];
@@ -215,10 +185,7 @@ public class CartasManager : MonoBehaviour
             }
         }
 
-        if (audioSource != null && sonidoRepartirCarta != null)
-        {
-            audioSource.PlayOneShot(sonidoRepartirCarta);
-        }
+        if (audioSource != null && sonidoRepartirCarta != null) audioSource.PlayOneShot(sonidoRepartirCarta);
 
         float elapsedTime = 0f;
 
@@ -238,10 +205,7 @@ public class CartasManager : MonoBehaviour
             yield return null;
         }
 
-        for (int i = 0; i < totalCards; i++)
-        {
-            handList[i].transform.localPosition = targetPositions[i];
-        }
+        for (int i = 0; i < totalCards; i++) handList[i].transform.localPosition = targetPositions[i];
 
         if (isVisible && cardRenderer != null)
         {
@@ -370,10 +334,7 @@ public class CartasManager : MonoBehaviour
 
     private void ActualizarPuntuacionUI()
     {
-        if (textoPuntosJugador != null)
-        {
-            textoPuntosJugador.text = CalculateHandValue(playerHandIndices).ToString();
-        }
+        if (textoPuntosJugador != null) textoPuntosJugador.text = CalculateHandValue(playerHandIndices).ToString();
 
         if (textoPuntosDealer != null)
         {
@@ -399,45 +360,73 @@ public class CartasManager : MonoBehaviour
         foreach (int index in handIndices)
         {
             CardData card = deckData[index];
-
-            if (card.isAce)
-            {
-                acesCount++;
-                totalValue += 11;
-            }
-            else
-            {
-                totalValue += card.cardValue;
-            }
+            if (card.isAce) { acesCount++; totalValue += 11; }
+            else { totalValue += card.cardValue; }
         }
 
-        while (totalValue > 21 && acesCount > 0)
-        {
-            totalValue -= 10;
-            acesCount--;
-        }
-
+        while (totalValue > 21 && acesCount > 0) { totalValue -= 10; acesCount--; }
         return totalValue;
     }
 
-    public bool UsarTijeras()
+    public bool UsarTijeras(Vector3 dropPos, float radius)
     {
-        if (!isPlayerTurn || playerCards.Count == 0) return false;
+        if (playerCards.Count == 0) return false;
 
-        GameObject lastCard = playerCards[playerCards.Count - 1];
-        playerCards.RemoveAt(playerCards.Count - 1);
-        playerHandIndices.RemoveAt(playerHandIndices.Count - 1);
-        Destroy(lastCard);
+        int closestIndex = -1;
+        float minDistance = float.MaxValue;
 
-        ActualizarPuntuacionUI();
-        NotificacionManager.Instance.MostrarMensaje("Has cortado tu ultima carta.", true, 2.5f);
-        return true;
+        for (int i = 0; i < playerCards.Count; i++)
+        {
+            float dist = Vector3.Distance(dropPos, playerCards[i].transform.position);
+            if (dist < minDistance)
+            {
+                minDistance = dist;
+                closestIndex = i;
+            }
+        }
+
+        if (closestIndex != -1 && minDistance <= radius)
+        {
+            GameObject cardToDestroy = playerCards[closestIndex];
+            playerCards.RemoveAt(closestIndex);
+            playerHandIndices.RemoveAt(closestIndex);
+            Destroy(cardToDestroy);
+
+            ReorganizarCartasVisibles(playerHandContainer, playerCards);
+            ActualizarPuntuacionUI();
+            
+            NotificacionManager.Instance.MostrarMensaje("Has cortado una carta.", true, 2.5f);
+
+            int currentScore = CalculateHandValue(playerHandIndices);
+            if (currentScore <= 21)
+            {
+                if (hitButton != null) hitButton.interactable = true;
+                if (standButton != null) standButton.interactable = true;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private void ReorganizarCartasVisibles(Transform container, List<GameObject> handList)
+    {
+        int totalCards = handList.Count;
+        if (totalCards == 0) return;
+
+        float totalWidth = (totalCards - 1) * cardSpacing;
+        float startX = -totalWidth / 2f;
+
+        for (int i = 0; i < totalCards; i++)
+        {
+            Vector3 targetPos = new Vector3(startX + (i * cardSpacing), 0, 0);
+            handList[i].transform.localPosition = targetPos;
+        }
     }
 
     public bool UsarRayosX()
     {
-        if (!isPlayerTurn || dealerHiddenCardRenderer == null || dealerCardRevealed) return false;
-
+        if (dealerHiddenCardRenderer == null || dealerCardRevealed) return false;
         dealerHiddenCardRenderer.sprite = deckData[dealerHiddenCardIndex].cardSprite;
         NotificacionManager.Instance.MostrarMensaje("Carta oculta revelada.", true, 2.5f);
         return true;
@@ -445,14 +434,10 @@ public class CartasManager : MonoBehaviour
 
     public bool UsarLupa()
     {
-        if (!isPlayerTurn || deck.Count == 0) return false;
-
+        if (deck.Count == 0) return false;
         int nextCardIndex = deck[0];
         CardData nextCard = deckData[nextCardIndex];
-        
-        string valor = nextCard.cardValue.ToString();
-        if (nextCard.isAce) valor = "As (11 o 1)";
-
+        string valor = nextCard.isAce ? "As (11 o 1)" : nextCard.cardValue.ToString();
         NotificacionManager.Instance.MostrarMensaje("Siguiente en mazo: " + valor, true, 3.5f);
         return true;
     }

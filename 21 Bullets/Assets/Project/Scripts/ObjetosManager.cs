@@ -36,7 +36,6 @@ public class ObjetosManager : MonoBehaviour
     public Texture2D cursorManoApuntar;
 
     public float distanciaInteraccion = 3.5f;
-
     public float duracionVuelo = 0.4f;
     public float tiempoEntreObjetos = 0.2f;
     
@@ -45,17 +44,15 @@ public class ObjetosManager : MonoBehaviour
 
     private GameObject[] objetosJugador = new GameObject[8];
     private GameObject[] objetosDealer = new GameObject[8];
+    public TipoObjeto[] tiposDealer = new TipoObjeto[8]; 
+
     private int capacidadMaxima = 8;
     private bool esperandoClickCaja = false;
 
     void Awake()
     {
         if (Instance == null) Instance = this;
-
-        if (objetoCajaVisual != null)
-        {
-            objetoCajaVisual.SetActive(false);
-        }
+        if (objetoCajaVisual != null) objetoCajaVisual.SetActive(false);
     }
 
     void Update()
@@ -140,6 +137,7 @@ public class ObjetosManager : MonoBehaviour
                     
                     GameObject objAnim = Instantiate(prefabObjetoAnimacion, posicionCajaDealer.position, Quaternion.identity);
                     objetosDealer[slotLibre] = objAnim;
+                    tiposDealer[slotLibre] = nuevoObjeto; 
 
                     yield return StartCoroutine(AnimarObjetoVolando(objAnim, nuevoObjeto, slotsDealer[slotLibre], posicionCajaDealer.position, false));
                     yield return new WaitForSeconds(tiempoEntreObjetos);
@@ -167,10 +165,7 @@ public class ObjetosManager : MonoBehaviour
             if (col == null)
             {
                 col = objAnim.AddComponent<BoxCollider2D>();
-                if (sr != null && sr.sprite != null)
-                {
-                    col.size = sr.sprite.bounds.size;
-                }
+                if (sr != null && sr.sprite != null) col.size = sr.sprite.bounds.size;
             }
 
             ObjetoInteractuable interactuable = objAnim.GetComponent<ObjetoInteractuable>();
@@ -201,32 +196,47 @@ public class ObjetosManager : MonoBehaviour
         bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
         bool enFaseDisparo = fasesManager.contenedorDisparo.activeSelf;
 
-        if (tipo == TipoObjeto.Lupa)
+        switch (tipo)
         {
-            if (enFaseCartas && cartasManager.deckTransform != null)
-            {
-                if (Vector3.Distance(posicionObjeto, cartasManager.deckTransform.position) < distanciaInteraccion) return true;
-            }
-            if (enFaseDisparo && disparoManager.objetoPistola != null)
-            {
-                if (Vector3.Distance(posicionObjeto, disparoManager.objetoPistola.transform.position) < distanciaInteraccion) return true;
-            }
+            case TipoObjeto.Lupa:
+                if (enFaseCartas && cartasManager.deckTransform != null)
+                    if (Vector3.Distance(posicionObjeto, cartasManager.deckTransform.position) < distanciaInteraccion) return true;
+                if (enFaseDisparo && disparoManager.objetoPistola != null)
+                    if (Vector3.Distance(posicionObjeto, disparoManager.objetoPistola.transform.position) < distanciaInteraccion) return true;
+                break;
+            case TipoObjeto.Polvora:
+            case TipoObjeto.Inversor:
+            case TipoObjeto.Muñeco:
+                if (enFaseDisparo && disparoManager.objetoPistola != null)
+                    if (Vector3.Distance(posicionObjeto, disparoManager.objetoPistola.transform.position) < distanciaInteraccion) return true;
+                break;
+            case TipoObjeto.Botiquin:
+            case TipoObjeto.Telefono:
+                if (posicionCajaJugador != null)
+                    if (Vector3.Distance(posicionObjeto, posicionCajaJugador.position) < distanciaInteraccion * 1.5f) return true;
+                break;
+            case TipoObjeto.Esposas:
+                if (enFaseDisparo && posicionCajaDealer != null)
+                    if (Vector3.Distance(posicionObjeto, posicionCajaDealer.position) < distanciaInteraccion * 1.5f) return true;
+                break;
+            case TipoObjeto.Tijeras:
+                if (enFaseCartas)
+                {
+                    foreach (GameObject card in cartasManager.playerCards)
+                        if (card != null && Vector3.Distance(posicionObjeto, card.transform.position) < distanciaInteraccion) return true;
+                }
+                break;
+            case TipoObjeto.RayosX:
+                if (enFaseCartas && cartasManager.dealerHandContainer != null)
+                    if (Vector3.Distance(posicionObjeto, cartasManager.dealerHandContainer.position) < distanciaInteraccion) return true;
+                break;
+            case TipoObjeto.Guante:
+                for (int i = 0; i < objetosDealer.Length; i++)
+                {
+                    if (objetosDealer[i] != null && Vector3.Distance(posicionObjeto, objetosDealer[i].transform.position) < distanciaInteraccion) return true;
+                }
+                break;
         }
-        else if (tipo == TipoObjeto.Tijeras)
-        {
-            if (enFaseCartas && cartasManager.playerHandContainer != null)
-            {
-                if (Vector3.Distance(posicionObjeto, cartasManager.playerHandContainer.position) < distanciaInteraccion) return true;
-            }
-        }
-        else if (tipo == TipoObjeto.RayosX)
-        {
-            if (enFaseCartas && cartasManager.dealerHandContainer != null)
-            {
-                if (Vector3.Distance(posicionObjeto, cartasManager.dealerHandContainer.position) < distanciaInteraccion) return true;
-            }
-        }
-
         return false;
     }
 
@@ -234,16 +244,27 @@ public class ObjetosManager : MonoBehaviour
     {
         if (objetoCajaVisual != null && objetoCajaVisual.activeSelf) return false;
 
-        if (!ComprobarZonaValida(obj.miTipo, obj.transform.position)) return false;
-
         bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
         bool enFaseDisparo = fasesManager.contenedorDisparo.activeSelf;
+
+        bool esMiTurno = false;
+        if (enFaseCartas) esMiTurno = cartasManager.isPlayerTurn;
+        if (enFaseDisparo) esMiTurno = disparoManager.turnoDelJugadorActual;
+
+        if (!esMiTurno)
+        {
+            NotificacionManager.Instance.MostrarMensaje("No es tu turno.", true, 2f);
+            return false;
+        }
+
+        if (!ComprobarZonaValida(obj.miTipo, obj.transform.position)) return false;
+
         bool usado = false;
 
         switch (obj.miTipo)
         {
             case TipoObjeto.Tijeras:
-                if (enFaseCartas) usado = cartasManager.UsarTijeras();
+                if (enFaseCartas) usado = cartasManager.UsarTijeras(obj.transform.position, distanciaInteraccion);
                 break;
             case TipoObjeto.RayosX:
                 if (enFaseCartas) usado = cartasManager.UsarRayosX();
@@ -251,6 +272,27 @@ public class ObjetosManager : MonoBehaviour
             case TipoObjeto.Lupa:
                 if (enFaseCartas) usado = cartasManager.UsarLupa();
                 else if (enFaseDisparo) usado = disparoManager.UsarLupa();
+                break;
+            case TipoObjeto.Botiquin:
+                usado = disparoManager.UsarBotiquin();
+                break;
+            case TipoObjeto.Esposas:
+                if (enFaseDisparo) usado = disparoManager.UsarEsposas();
+                break;
+            case TipoObjeto.Polvora:
+                if (enFaseDisparo) usado = disparoManager.UsarPolvora();
+                break;
+            case TipoObjeto.Inversor:
+                if (enFaseDisparo) usado = disparoManager.UsarInversor();
+                break;
+            case TipoObjeto.Muñeco:
+                if (enFaseDisparo) usado = disparoManager.UsarMuñeco();
+                break;
+            case TipoObjeto.Telefono:
+                usado = disparoManager.UsarTelefono(); 
+                break;
+            case TipoObjeto.Guante:
+                usado = UsarGuante(obj.transform.position);
                 break;
         }
 
@@ -260,6 +302,49 @@ public class ObjetosManager : MonoBehaviour
             return true;
         }
 
+        return false;
+    }
+
+    private bool UsarGuante(Vector3 dropPos)
+    {
+        int closestIndex = -1;
+        float minDistance = float.MaxValue;
+
+        for (int i = 0; i < objetosDealer.Length; i++)
+        {
+            if (objetosDealer[i] != null)
+            {
+                float dist = Vector3.Distance(dropPos, objetosDealer[i].transform.position);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                    closestIndex = i;
+                }
+            }
+        }
+
+        if (closestIndex != -1 && minDistance <= distanciaInteraccion)
+        {
+            int slotJugadorLibre = ObtenerSlotLibre(objetosJugador);
+            if (slotJugadorLibre == -1)
+            {
+                NotificacionManager.Instance.MostrarMensaje("Inventario lleno. No puedes robar.", true, 2f);
+                return false;
+            }
+
+            TipoObjeto tipoRobado = tiposDealer[closestIndex];
+
+            Destroy(objetosDealer[closestIndex]);
+            objetosDealer[closestIndex] = null;
+
+            GameObject objAnim = Instantiate(prefabObjetoAnimacion, slotsDealer[closestIndex].position, Quaternion.identity);
+            objetosJugador[slotJugadorLibre] = objAnim;
+
+            StartCoroutine(AnimarObjetoVolando(objAnim, tipoRobado, slotsJugador[slotJugadorLibre], slotsDealer[closestIndex].position, true));
+
+            NotificacionManager.Instance.MostrarMensaje("¡Has robado un objeto!", true, 2f);
+            return true;
+        }
         return false;
     }
 }
