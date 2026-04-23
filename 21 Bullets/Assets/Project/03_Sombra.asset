@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f7abf5dedefadc4fbec9ee6a78e2437, type: 3}
-  m_Name: Novato
+  m_Name: 03_Sombra
   m_EditorClassIdentifier: 
-  nombre: Novato
-  spriteRival: {fileID: -5110711910281351123, guid: 0e7b722ce252a034f9fadd1c9ce78ace, type: 3}
-  vidasMaximas: 3
-  umbralPlantadoBlackjack: 14
-  puedeUsarObjetos: 0
+  nombre: Sombra
+  spriteRival: {fileID: 5029909257001249753, guid: 866ae76dd7e6d3e42a3654f178fa8e07, type: 3}
+  vidasMaximas: 0
+  umbralPlantadoBlackjack: 17
+  puedeUsarObjetos: 1

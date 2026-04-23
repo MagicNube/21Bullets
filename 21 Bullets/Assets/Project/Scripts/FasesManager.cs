@@ -37,8 +37,6 @@ public class FasesManager : MonoBehaviour
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
 
-        NotificacionManager.Instance.MostrarMensaje("(Click para iniciar)", false);
-
         if (panelHUDJugador != null) panelHUDJugador.SetActive(false);
         if (panelHUDDealer != null) panelHUDDealer.SetActive(false);
 
@@ -54,15 +52,15 @@ public class FasesManager : MonoBehaviour
                 img.sprite = listaEnemigos[0].spriteRival;
             }
         }
+
+        StartCoroutine(RutinaInicioJuego());
     }
 
-    void Update()
+    private IEnumerator RutinaInicioJuego()
     {
-        if (!juegoIniciado && Input.GetMouseButtonDown(0))
-        {
-            juegoIniciado = true;
-            PrepararSiguienteEnemigo();
-        }
+        yield return new WaitForSeconds(1.0f);
+        juegoIniciado = true;
+        PrepararSiguienteEnemigo();
     }
 
     public void PrepararSiguienteEnemigo()
@@ -84,14 +82,12 @@ public class FasesManager : MonoBehaviour
         }
         else
         {
-            // Victoria total: El jugador ha vencido a todos los enemigos
             MostrarFinalJuego("¡HAS SOBREVIVIDO A TODOS!");
         }
     }
 
     public void JugadorHaMuerto()
     {
-        // Derrota: El jugador se ha quedado sin vidas
         MostrarFinalJuego("HAS CAÍDO...");
     }
 
@@ -99,14 +95,13 @@ public class FasesManager : MonoBehaviour
     {
         NotificacionManager.Instance.MostrarMensaje(mensaje, false);
 
-        // Usamos el MenuManager para abrir los créditos
         if (menuManager != null)
         {
-            menuManager.AbrirCreditos();
+            bool esVictoria = mensaje.Contains("SOBREVIVIDO");
+            menuManager.AbrirCreditosResultado(esVictoria);
         }
         else if (panelCreditosFinal != null)
         {
-            // Failsafe por si no se asignó el MenuManager
             panelCreditosFinal.SetActive(true);
         }
     }

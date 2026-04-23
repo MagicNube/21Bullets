@@ -2200,9 +2200,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<size=150%><b><color=#A30000>21 BULLETS</color></b></size>\r\n\r\n<size=80%><b>Desarrollo
-    y Programaci\xF3n</b></size>\r\n<size=60%><color=#A30000>Jes\xFAs Caravaca y
-    Hugo Juan</color></size>\r\n\r\n<size=80%><b>Arte y Dise\xF1o Visual</b></size>\r\n<size=60%><color=#A30000>Jes\xFAs
+  m_text: "<size=80%><b>Desarrollo y Programaci\xF3n</b></size>\r\n<size=60%><color=#A30000>Jes\xFAs
+    Caravaca y Hugo Juan</color></size>\r\n\r\n<size=80%><b>Arte y Dise\xF1o Visual</b></size>\r\n<size=60%><color=#A30000>Jes\xFAs
     Caravaca y Hugo Juan</color></size>\r\n\r\n<size=80%><b>M\xFAsica y Efectos de
     Sonido</b></size>\r\n<size=60%><color=#A30000>Jes\xFAs Caravaca y Hugo Juan</color></size>\r\n\r\n<size=80%><b>Agradecimientos
     Especiales</b></size>\r\n<size=60%><color=#A30000>A los bugs que se arreglaron
@@ -2861,7 +2860,7 @@ MonoBehaviour:
   menuManager: {fileID: 155023906}
   botonVersus1: {fileID: 1750212999}
   botonVersus2: {fileID: 705515735}
-  panelCreditosFinal: {fileID: 0}
+  panelCreditosFinal: {fileID: 1582571427}
   spriteProtagonista: {fileID: -4356740979746320664, guid: 5a682afcfe0245841b03af94c9aafa3d, type: 3}
   listaEnemigos:
   - {fileID: 11400000, guid: ab72fbefadde7374680b91f33d509c4b, type: 2}

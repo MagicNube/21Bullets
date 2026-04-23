@@ -33,6 +33,14 @@ public class IntroAnimacionManager : MonoBehaviour
 
     public void EjecutarAnimacion(Sprite prota, Sprite rival)
     {
+        if (fasesManager != null)
+        {
+            if (fasesManager.panelHUDJugador != null) fasesManager.panelHUDJugador.SetActive(false);
+            if (fasesManager.panelHUDDealer != null) fasesManager.panelHUDDealer.SetActive(false);
+            if (fasesManager.botonVersus1 != null) fasesManager.botonVersus1.interactable = false;
+            if (fasesManager.botonVersus2 != null) fasesManager.botonVersus2.interactable = false;
+        }
+
         objetoRaiz.SetActive(true);
 
         if (objetoTextoVS != null) objetoTextoVS.SetActive(true);

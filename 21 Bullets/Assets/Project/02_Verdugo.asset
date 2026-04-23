@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f7abf5dedefadc4fbec9ee6a78e2437, type: 3}
-  m_Name: Sombra
+  m_Name: 02_Verdugo
   m_EditorClassIdentifier: 
-  nombre: Sombra
-  spriteRival: {fileID: 5029909257001249753, guid: 866ae76dd7e6d3e42a3654f178fa8e07, type: 3}
+  nombre: Verdugo
+  spriteRival: {fileID: 3627130487054926999, guid: 5e2321f54b65b5e47869a78f1f2324c8, type: 3}
   vidasMaximas: 3
-  umbralPlantadoBlackjack: 17
+  umbralPlantadoBlackjack: 15
   puedeUsarObjetos: 1

@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f7abf5dedefadc4fbec9ee6a78e2437, type: 3}
-  m_Name: Verdugo
+  m_Name: 01_Novato
   m_EditorClassIdentifier: 
-  nombre: Verdugo
-  spriteRival: {fileID: 3627130487054926999, guid: 5e2321f54b65b5e47869a78f1f2324c8, type: 3}
-  vidasMaximas: 3
-  umbralPlantadoBlackjack: 15
-  puedeUsarObjetos: 1
+  nombre: Novato
+  spriteRival: {fileID: -5110711910281351123, guid: 0e7b722ce252a034f9fadd1c9ce78ace, type: 3}
+  vidasMaximas: 0
+  umbralPlantadoBlackjack: 14
+  puedeUsarObjetos: 0
