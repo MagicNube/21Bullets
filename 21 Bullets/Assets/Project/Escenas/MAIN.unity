@@ -4685,7 +4685,7 @@ AudioSource:
   m_GameObject: {fileID: 1140168282}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 7f79e70adc8c79443ad54e69ddda2dfc, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -5613,7 +5613,7 @@ AudioSource:
   m_GameObject: {fileID: 1414494574}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 7f79e70adc8c79443ad54e69ddda2dfc, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
@@ -6176,7 +6176,7 @@ AudioSource:
   m_GameObject: {fileID: 1651803356}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 7f79e70adc8c79443ad54e69ddda2dfc, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
@@ -7035,7 +7035,7 @@ MonoBehaviour:
   disparoManager: {fileID: 1140168283}
   objetosManager: {fileID: 1908922485}
   fasesManager: {fileID: 786156527}
-  cartasManager: {fileID: 0}
+  cartasManager: {fileID: 1414494576}
   tiempoPensamiento: 1.5
   tiempoEntreAcciones: 3
 --- !u!224 &1888359809 stripped

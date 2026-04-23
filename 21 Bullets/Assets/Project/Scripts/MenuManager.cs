@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Audio;
 using System.Collections;
 
 public class MenuManager : MonoBehaviour
@@ -9,12 +10,21 @@ public class MenuManager : MonoBehaviour
     public string nombreEscenaJuego;
 
     public AudioClip sonidoClick;
+    public AudioMixerGroup grupoAudio;
     private AudioSource audioSource;
 
-    void Start()
+    IEnumerator Start()
     {
         audioSource = GetComponent<AudioSource>();
-        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
+        if (grupoAudio != null)
+        {
+            audioSource.outputAudioMixerGroup = grupoAudio;
+        }
 
         if (panelOpciones != null)
         {
@@ -24,6 +34,30 @@ public class MenuManager : MonoBehaviour
         if (panelCreditos != null)
         {
             panelCreditos.SetActive(false);
+        }
+
+        yield return null;
+
+        if (grupoAudio != null)
+        {
+            float volumenGuardado = PlayerPrefs.GetFloat("VolumenMaster", 0.75f);
+            float volumenEnDecibelios = Mathf.Log10(Mathf.Clamp(volumenGuardado, 0.0001f, 1f)) * 20f;
+            grupoAudio.audioMixer.SetFloat("VolumenMaster", volumenEnDecibelios);
+        }
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (panelOpciones != null && panelOpciones.activeSelf)
+            {
+                CerrarOpciones();
+            }
+            else if (panelCreditos != null && panelCreditos.activeSelf)
+            {
+                CerrarCreditos();
+            }
         }
     }
 
