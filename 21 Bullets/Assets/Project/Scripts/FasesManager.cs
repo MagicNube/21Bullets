@@ -19,6 +19,11 @@ public class FasesManager : MonoBehaviour
     public GameObject panelHUDJugador;
     public GameObject panelHUDDealer;
 
+    [Header("Botones y Creditos")]
+    public Button botonVersus1;
+    public Button botonVersus2;
+    public GameObject panelCreditosFinal;
+
     public Sprite spriteProtagonista;
     public EnemigoData[] listaEnemigos;
     private int indiceEnemigoActual = 0;
@@ -30,11 +35,13 @@ public class FasesManager : MonoBehaviour
     {
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
-        
+
         NotificacionManager.Instance.MostrarMensaje("(Click para iniciar)", false);
 
         if (panelHUDJugador != null) panelHUDJugador.SetActive(false);
         if (panelHUDDealer != null) panelHUDDealer.SetActive(false);
+
+        if (panelCreditosFinal != null) panelCreditosFinal.SetActive(false);
 
         if (listaEnemigos != null && listaEnemigos.Length > 0 && contenedorImagenDealerHUD != null)
         {
@@ -64,7 +71,7 @@ public class FasesManager : MonoBehaviour
             EnemigoData datos = listaEnemigos[indiceEnemigoActual];
 
             cartasManager.dealerThreshold = datos.umbralPlantadoBlackjack;
-            
+
             if (objetosManager != null)
             {
                 objetosManager.enemigoRecibeObjetos = datos.puedeUsarObjetos;
@@ -77,6 +84,7 @@ public class FasesManager : MonoBehaviour
         else
         {
             NotificacionManager.Instance.MostrarMensaje("¡HAS SOBREVIVIDO A TODOS!", false);
+            if (panelCreditosFinal != null) panelCreditosFinal.SetActive(true);
         }
     }
 
@@ -86,6 +94,9 @@ public class FasesManager : MonoBehaviour
 
         if (panelHUDJugador != null) panelHUDJugador.SetActive(false);
         if (panelHUDDealer != null) panelHUDDealer.SetActive(false);
+
+        if (botonVersus1 != null) botonVersus1.interactable = false;
+        if (botonVersus2 != null) botonVersus2.interactable = false;
 
         if (contenedorImagenDealerHUD != null)
         {
@@ -98,7 +109,6 @@ public class FasesManager : MonoBehaviour
             }
         }
 
-        // LIMPIAR OBJETOS Y VIDAS AL CAMBIAR DE ENEMIGO
         disparoManager.ResetPartidaCompleta(enemigo.vidasMaximas);
         if (objetosManager != null)
         {
@@ -126,10 +136,13 @@ public class FasesManager : MonoBehaviour
         if (panelHUDJugador != null) panelHUDJugador.SetActive(true);
         if (panelHUDDealer != null) panelHUDDealer.SetActive(true);
 
+        if (botonVersus1 != null) botonVersus1.interactable = true;
+        if (botonVersus2 != null) botonVersus2.interactable = true;
+
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
         NotificacionManager.Instance.OcultarMensaje();
-        
+
         disparoManager.PrepararNuevaRonda();
         int numReales = disparoManager.ObtenerTotalRealesCalculadas();
         int numFogueo = disparoManager.ObtenerTotalFogueosCalculadas();
@@ -152,7 +165,7 @@ public class FasesManager : MonoBehaviour
     {
         contenedorDisparo.SetActive(false);
         contenedorCartas.SetActive(true);
-        
+
         if (!primerMensajeCartasMostrado)
         {
             NotificacionManager.Instance.MostrarMensaje("Gana la mano para tener el primer turno.", true, 3f);
@@ -162,7 +175,7 @@ public class FasesManager : MonoBehaviour
         {
             NotificacionManager.Instance.OcultarMensaje();
         }
-        
+
         cartasManager.ResetSequence();
     }
 

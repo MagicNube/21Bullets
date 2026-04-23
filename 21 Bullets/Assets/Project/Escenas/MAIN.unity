@@ -2645,6 +2645,9 @@ MonoBehaviour:
   contenedorImagenDealerHUD: {fileID: 597952619}
   panelHUDJugador: {fileID: 160428689}
   panelHUDDealer: {fileID: 2046548704}
+  botonVersus1: {fileID: 1750212999}
+  botonVersus2: {fileID: 705515735}
+  panelCreditosFinal: {fileID: 0}
   spriteProtagonista: {fileID: -4356740979746320664, guid: 5a682afcfe0245841b03af94c9aafa3d, type: 3}
   listaEnemigos:
   - {fileID: 11400000, guid: ab72fbefadde7374680b91f33d509c4b, type: 2}
@@ -4670,6 +4673,8 @@ MonoBehaviour:
   vidasDealer: 3
   vidasMaximasDealer: 3
   turnoDelJugadorActual: 0
+  jugadorInmuneAEsposas: 0
+  dealerInmuneAEsposas: 0
   objetosUsadosEsteDisparo: 0
 --- !u!82 &1140168284
 AudioSource:
@@ -5598,6 +5603,7 @@ MonoBehaviour:
   dealerHandIndices: 
   isPlayerTurn: 0
   objetosUsadosEnCartas: 0
+  esperandoCorte: 0
 --- !u!82 &1414494577
 AudioSource:
   m_ObjectHideFlags: 0
@@ -7031,6 +7037,7 @@ MonoBehaviour:
   fasesManager: {fileID: 786156527}
   cartasManager: {fileID: 0}
   tiempoPensamiento: 1.5
+  tiempoEntreAcciones: 3
 --- !u!224 &1888359809 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3319852182559381488, guid: 34174aa5b19592a498d339b36c766bd1, type: 3}
