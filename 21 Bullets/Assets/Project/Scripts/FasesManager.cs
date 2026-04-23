@@ -27,7 +27,8 @@ public class FasesManager : MonoBehaviour
 
     public Sprite spriteProtagonista;
     public EnemigoData[] listaEnemigos;
-    private int indiceEnemigoActual = 0;
+    public int indiceEnemigoActual = 0;
+    
 
     private bool primerMensajeCartasMostrado = false;
 
