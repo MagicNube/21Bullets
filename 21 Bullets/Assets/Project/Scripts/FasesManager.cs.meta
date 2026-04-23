@@ -1,2 +1,25 @@
 fileFormatVersion: 2
 guid: 66d67db174a2ebd4cb62d24dcfd1cf8c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - contenedorCartas: {instanceID: 0}
+  - contenedorDisparo: {instanceID: 0}
+  - cartasManager: {instanceID: 0}
+  - disparoManager: {instanceID: 0}
+  - animacionTambor: {instanceID: 0}
+  - objetosManager: {instanceID: 0}
+  - introManager: {instanceID: 0}
+  - contenedorImagenDealerHUD: {instanceID: 0}
+  - panelHUDJugador: {instanceID: 0}
+  - panelHUDDealer: {instanceID: 0}
+  - botonVersus1: {instanceID: 0}
+  - botonVersus2: {instanceID: 0}
+  - panelCreditosFinal: {instanceID: 0}
+  - spriteProtagonista: {fileID: -4356740979746320664, guid: 5a682afcfe0245841b03af94c9aafa3d, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -16,4 +16,4 @@ MonoBehaviour:
   spriteRival: {fileID: -5110711910281351123, guid: 0e7b722ce252a034f9fadd1c9ce78ace, type: 3}
   vidasMaximas: 3
   umbralPlantadoBlackjack: 14
-  puedeUsarObjetos: 0
+  puedeUsarObjetos: 1
