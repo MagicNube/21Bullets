@@ -1083,7 +1083,7 @@ MonoBehaviour:
   balaVisual: {fileID: 1098126230}
   pantallazoFlash: {fileID: 1858999424}
   camaraPrincipal: {fileID: 1023532553}
-  nombreEscenaMenu: 01_PRINCIPAL
+  nombreEscenaMenu: "02_MEN\xDA"
   sonidoDisparo: {fileID: 8300000, guid: b95d8d63a0da55844a230a5793b1f99d, type: 3}
   delayEntreTextos: 0.8
   pausaAntesDisparo: 0.4

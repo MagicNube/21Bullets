@@ -111,8 +111,8 @@ public class FasesManager : MonoBehaviour
         if (panelHUDJugador != null) panelHUDJugador.SetActive(false);
         if (panelHUDDealer != null) panelHUDDealer.SetActive(false);
 
-        if (botonVersus1 != null) botonVersus1.interactable = false;
-        if (botonVersus2 != null) botonVersus2.interactable = false;
+        if (botonVersus1 != null) botonVersus1.gameObject.SetActive(false);
+        if (botonVersus2 != null) botonVersus2.gameObject.SetActive(false);
 
         if (contenedorImagenDealerHUD != null)
         {
@@ -152,8 +152,8 @@ public class FasesManager : MonoBehaviour
         if (panelHUDJugador != null) panelHUDJugador.SetActive(true);
         if (panelHUDDealer != null) panelHUDDealer.SetActive(true);
 
-        if (botonVersus1 != null) botonVersus1.interactable = true;
-        if (botonVersus2 != null) botonVersus2.interactable = true;
+        if (botonVersus1 != null) botonVersus1.gameObject.SetActive(true);
+        if (botonVersus2 != null) botonVersus2.gameObject.SetActive(true);
 
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
