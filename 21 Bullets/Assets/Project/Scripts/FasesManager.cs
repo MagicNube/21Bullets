@@ -18,6 +18,7 @@ public class FasesManager : MonoBehaviour
 
     public GameObject panelHUDJugador;
     public GameObject panelHUDDealer;
+    public MenuManager menuManager;
 
     [Header("Botones y Creditos")]
     public Button botonVersus1;
@@ -83,8 +84,30 @@ public class FasesManager : MonoBehaviour
         }
         else
         {
-            NotificacionManager.Instance.MostrarMensaje("¡HAS SOBREVIVIDO A TODOS!", false);
-            if (panelCreditosFinal != null) panelCreditosFinal.SetActive(true);
+            // Victoria total: El jugador ha vencido a todos los enemigos
+            MostrarFinalJuego("¡HAS SOBREVIVIDO A TODOS!");
+        }
+    }
+
+    public void JugadorHaMuerto()
+    {
+        // Derrota: El jugador se ha quedado sin vidas
+        MostrarFinalJuego("HAS CAÍDO...");
+    }
+
+    private void MostrarFinalJuego(string mensaje)
+    {
+        NotificacionManager.Instance.MostrarMensaje(mensaje, false);
+
+        // Usamos el MenuManager para abrir los créditos
+        if (menuManager != null)
+        {
+            menuManager.AbrirCreditos();
+        }
+        else if (panelCreditosFinal != null)
+        {
+            // Failsafe por si no se asignó el MenuManager
+            panelCreditosFinal.SetActive(true);
         }
     }
 

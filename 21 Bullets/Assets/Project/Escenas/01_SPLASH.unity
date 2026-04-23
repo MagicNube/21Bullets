@@ -1087,7 +1087,7 @@ MonoBehaviour:
   sonidoDisparo: {fileID: 8300000, guid: b95d8d63a0da55844a230a5793b1f99d, type: 3}
   delayEntreTextos: 0.8
   pausaAntesDisparo: 0.4
-  tiempoAutoSkip: 5
+  tiempoAutoSkip: 3.5
   duracionFadeOut: 1
 --- !u!82 &1905790638
 AudioSource:
