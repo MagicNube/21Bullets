@@ -4667,6 +4667,10 @@ MonoBehaviour:
   botonDealer: {fileID: 705515735}
   sonidoDisparoReal: {fileID: 8300000, guid: b95d8d63a0da55844a230a5793b1f99d, type: 3}
   sonidoDisparoFogueo: {fileID: 8300000, guid: 53c1b62eee792c041a1f8bd350a2a692, type: 3}
+  vidasDealer: 3
+  vidasMaximasDealer: 3
+  turnoDelJugadorActual: 0
+  objetosUsadosEsteDisparo: 0
 --- !u!82 &1140168284
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5519,6 +5523,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fasesManager: {fileID: 786156527}
+  dealerIA: {fileID: 0}
   allCardSprites:
   - {fileID: -2364073077325501991, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
   - {fileID: -2076147174, guid: 7aecfc86a2093694f817e38b1c94587b, type: 3}
@@ -5588,6 +5593,11 @@ MonoBehaviour:
   textoPuntosJugador: {fileID: 1791767690}
   textoPuntosDealer: {fileID: 866530930}
   sonidoRepartirCarta: {fileID: 8300000, guid: f80bf63e7482897469d7615f21cf7cfe, type: 3}
+  playerCards: []
+  playerHandIndices: 
+  dealerHandIndices: 
+  isPlayerTurn: 0
+  objetosUsadosEnCartas: 0
 --- !u!82 &1414494577
 AudioSource:
   m_ObjectHideFlags: 0
@@ -7013,12 +7023,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1882545227}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ff665109286b304181bd0b28e3ee953, type: 3}
+  m_Script: {fileID: 11500000, guid: 0e40058ad1cfed54d84fca4061bfc3da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   disparoManager: {fileID: 1140168283}
+  objetosManager: {fileID: 1908922485}
+  fasesManager: {fileID: 786156527}
+  cartasManager: {fileID: 0}
   tiempoPensamiento: 1.5
-  probabilidadError: 0.3
 --- !u!224 &1888359809 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3319852182559381488, guid: 34174aa5b19592a498d339b36c766bd1, type: 3}
@@ -7113,6 +7125,25 @@ MonoBehaviour:
   duracionVuelo: 0.4
   tiempoEntreObjetos: 0.2
   enemigoRecibeObjetos: 1
+  objetosJugador:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  objetosDealer:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  tiposDealer: 0000000000000000000000000000000000000000000000000000000000000000
 --- !u!1 &2006364539
 GameObject:
   m_ObjectHideFlags: 0

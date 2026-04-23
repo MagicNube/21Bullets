@@ -42,8 +42,8 @@ public class ObjetosManager : MonoBehaviour
     [HideInInspector]
     public bool enemigoRecibeObjetos = false;
 
-    private GameObject[] objetosJugador = new GameObject[8];
-    private GameObject[] objetosDealer = new GameObject[8];
+    public GameObject[] objetosJugador = new GameObject[8];
+    public GameObject[] objetosDealer = new GameObject[8];
     public TipoObjeto[] tiposDealer = new TipoObjeto[8]; 
 
     private int capacidadMaxima = 8;
@@ -71,6 +71,8 @@ public class ObjetosManager : MonoBehaviour
         bool enFaseDisparo = fasesManager.contenedorDisparo.activeSelf;
         bool esMiTurno = (enFaseCartas && cartasManager.isPlayerTurn) || (enFaseDisparo && disparoManager.turnoDelJugadorActual);
 
+        if (cartasManager.esperandoCorte) esMiTurno = false;
+
         for (int i = 0; i < objetosJugador.Length; i++)
         {
             if (objetosJugador[i] != null)
@@ -79,6 +81,10 @@ public class ObjetosManager : MonoBehaviour
                 if (oi != null)
                 {
                     bool usable = esMiTurno;
+                    
+                    if (usable && enFaseCartas && cartasManager.objetosUsadosEnCartas >= 2) usable = false;
+                    if (usable && enFaseDisparo && disparoManager.objetosUsadosEsteDisparo >= 1) usable = false;
+
                     if (usable)
                     {
                         switch (oi.miTipo)
@@ -90,8 +96,14 @@ public class ObjetosManager : MonoBehaviour
                             case TipoObjeto.Polvora:
                             case TipoObjeto.Inversor:
                             case TipoObjeto.Muñeco:
-                            case TipoObjeto.Esposas: 
+                            case TipoObjeto.Esposas:
+                            case TipoObjeto.Telefono:
                                 usable = enFaseDisparo; 
+                                break;
+                            case TipoObjeto.Lupa:
+                            case TipoObjeto.Guante:
+                            case TipoObjeto.Botiquin:
+                                usable = true;
                                 break;
                         }
                     }
@@ -125,6 +137,15 @@ public class ObjetosManager : MonoBehaviour
             if (array[i] == null) return i;
         }
         return -1;
+    }
+
+    private TipoObjeto ObtenerObjetoAleatorioDealer()
+    {
+        TipoObjeto obj;
+        do {
+            obj = (TipoObjeto)UnityEngine.Random.Range(0, 10);
+        } while (obj == TipoObjeto.RayosX); 
+        return obj;
     }
 
     private IEnumerator RutinaRepartirObjetos(Action onTerminado)
@@ -183,7 +204,7 @@ public class ObjetosManager : MonoBehaviour
                 int slotLibre = ObtenerSlotLibre(objetosDealer);
                 if (slotLibre != -1)
                 {
-                    TipoObjeto nuevoObjeto = (TipoObjeto)UnityEngine.Random.Range(0, 10);
+                    TipoObjeto nuevoObjeto = ObtenerObjetoAleatorioDealer();
                     
                     GameObject objAnim = Instantiate(prefabObjetoAnimacion, posicionCajaDealer.position, Quaternion.identity);
                     objetosDealer[slotLibre] = objAnim;
@@ -241,6 +262,30 @@ public class ObjetosManager : MonoBehaviour
         objAnim.transform.SetParent(destino);
     }
 
+    public bool EsObjetoRobableYUsable(TipoObjeto tipo, bool esParaJugador)
+    {
+        if (tipo == TipoObjeto.Guante) return false;
+        if (!esParaJugador && tipo == TipoObjeto.RayosX) return false;
+
+        bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
+        bool enFaseDisparo = fasesManager.contenedorDisparo.activeSelf;
+
+        if (enFaseCartas)
+        {
+            if (cartasManager.objetosUsadosEnCartas >= 2) return false;
+            if (esParaJugador) return tipo == TipoObjeto.Tijeras || tipo == TipoObjeto.RayosX || tipo == TipoObjeto.Lupa || tipo == TipoObjeto.Botiquin;
+            else return tipo == TipoObjeto.Tijeras || tipo == TipoObjeto.Lupa || tipo == TipoObjeto.Botiquin;
+        }
+        else if (enFaseDisparo)
+        {
+            if (disparoManager.objetosUsadosEsteDisparo >= 1) return false;
+            return tipo == TipoObjeto.Botiquin || tipo == TipoObjeto.Esposas || tipo == TipoObjeto.Inversor ||
+                   tipo == TipoObjeto.Lupa || tipo == TipoObjeto.Muñeco || tipo == TipoObjeto.Polvora ||
+                   tipo == TipoObjeto.Telefono;
+        }
+        return false;
+    }
+
     public void ResaltarZonasValidas(TipoObjeto tipo, bool resaltar)
     {
         List<GameObject> objetivos = new List<GameObject>();
@@ -279,8 +324,10 @@ public class ObjetosManager : MonoBehaviour
                 }
                 break;
             case TipoObjeto.Guante:
-                foreach (var obj in objetosDealer) {
-                    if (obj != null) objetivos.Add(obj);
+                for (int i = 0; i < objetosDealer.Length; i++) {
+                    if (objetosDealer[i] != null && EsObjetoRobableYUsable(tiposDealer[i], true)) {
+                        objetivos.Add(objetosDealer[i]);
+                    }
                 }
                 break;
         }
@@ -340,7 +387,8 @@ public class ObjetosManager : MonoBehaviour
             case TipoObjeto.Guante:
                 for (int i = 0; i < objetosDealer.Length; i++)
                 {
-                    if (objetosDealer[i] != null && Vector3.Distance(posicionObjeto, objetosDealer[i].transform.position) < distanciaInteraccion) return true;
+                    if (objetosDealer[i] != null && EsObjetoRobableYUsable(tiposDealer[i], true))
+                        if (Vector3.Distance(posicionObjeto, objetosDealer[i].transform.position) < distanciaInteraccion) return true;
                 }
                 break;
         }
@@ -350,6 +398,7 @@ public class ObjetosManager : MonoBehaviour
     public bool IntentarUsarObjetoJugador(ObjetoInteractuable obj)
     {
         if (objetoCajaVisual != null && objetoCajaVisual.activeSelf) return false;
+        if (cartasManager.esperandoCorte) return false;
 
         bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
         bool enFaseDisparo = fasesManager.contenedorDisparo.activeSelf;
@@ -361,6 +410,17 @@ public class ObjetosManager : MonoBehaviour
         if (!esMiTurno)
         {
             NotificacionManager.Instance.MostrarMensaje("No es tu turno.", true, 2f);
+            return false;
+        }
+
+        if (enFaseCartas && cartasManager.objetosUsadosEnCartas >= 2)
+        {
+            NotificacionManager.Instance.MostrarMensaje("Límite de 2 objetos por mano.", true, 2f);
+            return false;
+        }
+        if (enFaseDisparo && disparoManager.objetosUsadosEsteDisparo >= 1)
+        {
+            NotificacionManager.Instance.MostrarMensaje("Límite de 1 objeto por disparo.", true, 2f);
             return false;
         }
 
@@ -387,35 +447,38 @@ public class ObjetosManager : MonoBehaviour
                 if (enFaseCartas) usado = cartasManager.UsarRayosX();
                 break;
             case TipoObjeto.Lupa:
-                if (enFaseCartas) usado = cartasManager.UsarLupa();
-                else if (enFaseDisparo) usado = disparoManager.UsarLupa();
+                if (enFaseCartas) usado = cartasManager.UsarLupa(true);
+                else if (enFaseDisparo) usado = disparoManager.UsarLupa(true);
                 break;
             case TipoObjeto.Botiquin:
-                usado = disparoManager.UsarBotiquin();
+                usado = disparoManager.UsarBotiquin(true);
                 break;
             case TipoObjeto.Esposas:
-                if (enFaseDisparo) usado = disparoManager.UsarEsposas();
+                if (enFaseDisparo) usado = disparoManager.UsarEsposas(true);
                 break;
             case TipoObjeto.Polvora:
-                if (enFaseDisparo) usado = disparoManager.UsarPolvora();
+                if (enFaseDisparo) usado = disparoManager.UsarPolvora(true);
                 break;
             case TipoObjeto.Inversor:
-                if (enFaseDisparo) usado = disparoManager.UsarInversor();
+                if (enFaseDisparo) usado = disparoManager.UsarInversor(true);
                 break;
             case TipoObjeto.Muñeco:
-                if (enFaseDisparo) usado = disparoManager.UsarMuñeco();
+                if (enFaseDisparo) usado = disparoManager.UsarMuñeco(true);
                 break;
             case TipoObjeto.Telefono:
-                usado = disparoManager.UsarTelefono(); 
+                if (enFaseDisparo) usado = disparoManager.UsarTelefono(true); 
                 break;
             case TipoObjeto.Guante:
-                usado = UsarGuante(obj.transform.position, indexSlot);
+                usado = UsarGuanteJugador(obj.transform.position);
                 break;
         }
 
         if (usado)
         {
-            if (obj.miTipo != TipoObjeto.Guante && indexSlot != -1)
+            if (enFaseCartas) cartasManager.objetosUsadosEnCartas++;
+            if (enFaseDisparo) disparoManager.objetosUsadosEsteDisparo++;
+
+            if (indexSlot != -1)
             {
                 objetosJugador[indexSlot] = null;
             }
@@ -426,14 +489,47 @@ public class ObjetosManager : MonoBehaviour
         return false;
     }
 
-    private bool UsarGuante(Vector3 dropPos, int slotJugadorOrigen)
+    private bool EjecutarEfectoInmediato(TipoObjeto tipo, bool esJugador)
+    {
+        bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
+        bool enFaseDisparo = fasesManager.contenedorDisparo.activeSelf;
+
+        switch (tipo)
+        {
+            case TipoObjeto.Tijeras:
+                if (enFaseCartas) return cartasManager.UsarTijerasAuto(esJugador);
+                break;
+            case TipoObjeto.RayosX:
+                if (enFaseCartas) return cartasManager.UsarRayosX();
+                break;
+            case TipoObjeto.Lupa:
+                if (enFaseCartas) return cartasManager.UsarLupa(esJugador);
+                else if (enFaseDisparo) return disparoManager.UsarLupa(esJugador);
+                break;
+            case TipoObjeto.Botiquin:
+                return disparoManager.UsarBotiquin(esJugador);
+            case TipoObjeto.Esposas:
+                return disparoManager.UsarEsposas(esJugador);
+            case TipoObjeto.Polvora:
+                return disparoManager.UsarPolvora(esJugador);
+            case TipoObjeto.Inversor:
+                return disparoManager.UsarInversor(esJugador);
+            case TipoObjeto.Muñeco:
+                return disparoManager.UsarMuñeco(esJugador);
+            case TipoObjeto.Telefono:
+                return disparoManager.UsarTelefono(esJugador);
+        }
+        return false;
+    }
+
+    private bool UsarGuanteJugador(Vector3 dropPos)
     {
         int closestIndex = -1;
         float minDistance = float.MaxValue;
 
         for (int i = 0; i < objetosDealer.Length; i++)
         {
-            if (objetosDealer[i] != null)
+            if (objetosDealer[i] != null && EsObjetoRobableYUsable(tiposDealer[i], true))
             {
                 float dist = Vector3.Distance(dropPos, objetosDealer[i].transform.position);
                 if (dist < minDistance)
@@ -446,20 +542,125 @@ public class ObjetosManager : MonoBehaviour
 
         if (closestIndex != -1 && minDistance <= distanciaInteraccion)
         {
-            if (slotJugadorOrigen == -1) return false;
-
             TipoObjeto tipoRobado = tiposDealer[closestIndex];
 
-            Destroy(objetosDealer[closestIndex]);
-            objetosDealer[closestIndex] = null;
+            bool efectoAplicado = EjecutarEfectoInmediato(tipoRobado, true);
 
-            GameObject objAnim = Instantiate(prefabObjetoAnimacion, slotsDealer[closestIndex].position, Quaternion.identity);
-            objetosJugador[slotJugadorOrigen] = objAnim; 
+            if (efectoAplicado)
+            {
+                Destroy(objetosDealer[closestIndex]);
+                objetosDealer[closestIndex] = null;
+                NotificacionManager.Instance.MostrarMensaje($"¡Has robado y usado: {tipoRobado}!", true, 3f);
+                return true;
+            }
+            else
+            {
+                NotificacionManager.Instance.MostrarMensaje($"No puedes usar {tipoRobado} en este momento.", true, 2.5f);
+                return false;
+            }
+        }
+        return false;
+    }
 
-            StartCoroutine(AnimarObjetoVolando(objAnim, tipoRobado, slotsJugador[slotJugadorOrigen], slotsDealer[closestIndex].position, true));
+    public bool DealerTieneObjeto(TipoObjeto tipo)
+    {
+        for (int i = 0; i < objetosDealer.Length; i++)
+        {
+            if (objetosDealer[i] != null && tiposDealer[i] == tipo) return true;
+        }
+        return false;
+    }
 
-            NotificacionManager.Instance.MostrarMensaje("¡Has robado un objeto!", true, 2f);
-            return true;
+    public bool JugadorTieneObjetosFaseDisparo()
+    {
+        for (int i = 0; i < objetosJugador.Length; i++)
+        {
+            if (objetosJugador[i] != null)
+            {
+                ObjetoInteractuable oi = objetosJugador[i].GetComponent<ObjetoInteractuable>();
+                if (oi != null && EsObjetoRobableYUsable(oi.miTipo, false)) return true;
+            }
+        }
+        return false;
+    }
+
+    public void IntentarUsarObjetoDealer(TipoObjeto tipo)
+    {
+        bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
+        bool enFaseDisparo = fasesManager.contenedorDisparo.activeSelf;
+
+        if (enFaseCartas && cartasManager.objetosUsadosEnCartas >= 2) return;
+        if (enFaseDisparo && disparoManager.objetosUsadosEsteDisparo >= 1) return;
+
+        int index = -1;
+        for (int i = 0; i < objetosDealer.Length; i++)
+        {
+            if (objetosDealer[i] != null && tiposDealer[i] == tipo)
+            {
+                index = i;
+                break;
+            }
+        }
+        if (index == -1) return;
+
+        bool usado = false;
+
+        switch (tipo)
+        {
+            case TipoObjeto.Botiquin: usado = disparoManager.UsarBotiquin(false); break;
+            case TipoObjeto.Lupa:
+                if (enFaseCartas) usado = cartasManager.UsarLupa(false);
+                else usado = disparoManager.UsarLupa(false);
+                break;
+            case TipoObjeto.Polvora: usado = disparoManager.UsarPolvora(false); break;
+            case TipoObjeto.Esposas: usado = disparoManager.UsarEsposas(false); break;
+            case TipoObjeto.Inversor: usado = disparoManager.UsarInversor(false); break;
+            case TipoObjeto.Telefono: usado = disparoManager.UsarTelefono(false); break;
+            case TipoObjeto.Muñeco: usado = disparoManager.UsarMuñeco(false); break;
+            case TipoObjeto.Tijeras: usado = cartasManager.UsarTijerasAuto(false); break;
+            case TipoObjeto.Guante: usado = UsarGuanteDealer(); break;
+        }
+
+        if (usado)
+        {
+            if (enFaseCartas) cartasManager.objetosUsadosEnCartas++;
+            if (enFaseDisparo) disparoManager.objetosUsadosEsteDisparo++;
+
+            Destroy(objetosDealer[index]);
+            objetosDealer[index] = null;
+        }
+    }
+
+    private bool UsarGuanteDealer()
+    {
+        List<int> validIndices = new List<int>();
+        for (int i = 0; i < objetosJugador.Length; i++)
+        {
+            if (objetosJugador[i] != null)
+            {
+                ObjetoInteractuable oi = objetosJugador[i].GetComponent<ObjetoInteractuable>();
+                if (oi != null && EsObjetoRobableYUsable(oi.miTipo, false))
+                {
+                    validIndices.Add(i);
+                }
+            }
+        }
+
+        if (validIndices.Count > 0)
+        {
+            int stolenIndex = validIndices[UnityEngine.Random.Range(0, validIndices.Count)];
+            ObjetoInteractuable oi = objetosJugador[stolenIndex].GetComponent<ObjetoInteractuable>();
+            TipoObjeto tipoRobado = oi.miTipo;
+
+            bool usado = EjecutarEfectoInmediato(tipoRobado, false);
+
+            if (usado)
+            {
+                Destroy(objetosJugador[stolenIndex]);
+                objetosJugador[stolenIndex] = null;
+                NotificacionManager.Instance.MostrarMensaje($"¡El Dealer te robó y usó: {tipoRobado}!", true, 3f);
+                return true;
+            }
         }
         return false;
     }

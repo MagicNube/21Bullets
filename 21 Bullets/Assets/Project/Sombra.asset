@@ -15,5 +15,5 @@ MonoBehaviour:
   nombre: Sombra
   spriteRival: {fileID: 5029909257001249753, guid: 866ae76dd7e6d3e42a3654f178fa8e07, type: 3}
   vidasMaximas: 3
-  umbralPlantadoBlackjack: 16
+  umbralPlantadoBlackjack: 17
   puedeUsarObjetos: 1

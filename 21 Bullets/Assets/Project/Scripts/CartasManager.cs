@@ -16,6 +16,7 @@ public class CardData
 public class CartasManager : MonoBehaviour
 {
     public FasesManager fasesManager;
+    public DealerIA dealerIA;
     public Sprite[] allCardSprites;
 
     [HideInInspector]
@@ -46,13 +47,16 @@ public class CartasManager : MonoBehaviour
     public List<GameObject> playerCards = new List<GameObject>();
     private List<GameObject> dealerCards = new List<GameObject>();
 
-    private List<int> playerHandIndices = new List<int>();
-    private List<int> dealerHandIndices = new List<int>();
+    public List<int> playerHandIndices = new List<int>();
+    public List<int> dealerHandIndices = new List<int>();
 
     public bool isPlayerTurn = false;
     private SpriteRenderer dealerHiddenCardRenderer;
     private int dealerHiddenCardIndex;
     private bool dealerCardRevealed = false;
+
+    public int objetosUsadosEnCartas = 0;
+    public bool esperandoCorte = false;
 
     private AudioSource audioSource;
 
@@ -61,6 +65,58 @@ public class CartasManager : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         if (hitButton != null) hitButton.onClick.AddListener(OnHitClicked);
         if (standButton != null) standButton.onClick.AddListener(OnStandClicked);
+    }
+
+    void Update()
+    {
+        if (esperandoCorte && Input.GetMouseButtonDown(0))
+        {
+            Vector3 dropPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            dropPos.z = 0;
+            
+            int closestIndex = -1;
+            float minDistance = float.MaxValue;
+
+            for (int i = 0; i < playerCards.Count; i++)
+            {
+                float dist = Vector3.Distance(dropPos, playerCards[i].transform.position);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                    closestIndex = i;
+                }
+            }
+
+            if (closestIndex != -1 && minDistance <= 2.0f)
+            {
+                foreach (GameObject card in playerCards)
+                {
+                    if (card != null)
+                    {
+                        EfectoLatido latido = card.GetComponent<EfectoLatido>();
+                        if (latido != null) Destroy(latido);
+                    }
+                }
+
+                GameObject cardToDestroy = playerCards[closestIndex];
+                playerCards.RemoveAt(closestIndex);
+                playerHandIndices.RemoveAt(closestIndex);
+                Destroy(cardToDestroy);
+
+                ReorganizarCartasVisibles(playerHandContainer, playerCards);
+                ActualizarPuntuacionUI();
+                
+                NotificacionManager.Instance.MostrarMensaje("Has cortado una carta.", true, 2.5f);
+                esperandoCorte = false;
+
+                int currentScore = CalculateHandValue(playerHandIndices);
+                if (currentScore <= 21)
+                {
+                    if (hitButton != null) hitButton.interactable = true;
+                    if (standButton != null) standButton.interactable = true;
+                }
+            }
+        }
     }
 
     public void ResetSequence()
@@ -78,6 +134,8 @@ public class CartasManager : MonoBehaviour
         isPlayerTurn = false;
         dealerHiddenCardRenderer = null;
         dealerCardRevealed = false;
+        objetosUsadosEnCartas = 0;
+        esperandoCorte = false;
 
         if (hitButton != null) hitButton.interactable = false;
         if (standButton != null) standButton.interactable = false;
@@ -249,7 +307,7 @@ public class CartasManager : MonoBehaviour
 
     public void OnHitClicked()
     {
-        if (!isPlayerTurn) return;
+        if (!isPlayerTurn || esperandoCorte) return;
         if (hitButton != null) hitButton.interactable = false;
         if (standButton != null) standButton.interactable = false;
         StartCoroutine(HitRoutine());
@@ -278,7 +336,7 @@ public class CartasManager : MonoBehaviour
 
     public void OnStandClicked()
     {
-        if (!isPlayerTurn) return;
+        if (!isPlayerTurn || esperandoCorte) return;
         isPlayerTurn = false;
         if (hitButton != null) hitButton.interactable = false;
         if (standButton != null) standButton.interactable = false;
@@ -298,6 +356,8 @@ public class CartasManager : MonoBehaviour
 
         while (CalculateHandValue(dealerHandIndices) < dealerThreshold)
         {
+            if (dealerIA != null) yield return StartCoroutine(dealerIA.PensarObjetosCartas());
+
             yield return StartCoroutine(DrawCardRoutine(dealerHandContainer, dealerCards, dealerHandIndices, true, false));
             ActualizarPuntuacionUI();
             yield return new WaitForSeconds(delayBetweenCards);
@@ -409,6 +469,41 @@ public class CartasManager : MonoBehaviour
         return false;
     }
 
+    public bool UsarTijerasAuto(bool esJugador)
+    {
+        if (esJugador)
+        {
+            if (playerCards.Count == 0) return false;
+            
+            esperandoCorte = true;
+            if (hitButton != null) hitButton.interactable = false;
+            if (standButton != null) standButton.interactable = false;
+            NotificacionManager.Instance.MostrarMensaje("Tijeras robadas: Haz clic en la carta que quieres cortar.", false);
+
+            foreach (GameObject card in playerCards)
+            {
+                if (card != null && card.GetComponent<EfectoLatido>() == null) card.AddComponent<EfectoLatido>();
+            }
+
+            return true;
+        }
+        else
+        {
+            if (dealerCards.Count == 0) return false;
+
+            GameObject cardToDestroy = dealerCards[dealerCards.Count - 1];
+            dealerCards.RemoveAt(dealerCards.Count - 1);
+            dealerHandIndices.RemoveAt(dealerHandIndices.Count - 1);
+            Destroy(cardToDestroy);
+
+            ReorganizarCartasVisibles(dealerHandContainer, dealerCards);
+            ActualizarPuntuacionUI();
+
+            NotificacionManager.Instance.MostrarMensaje("El Dealer ha cortado su última carta.", true, 2.5f);
+            return true;
+        }
+    }
+
     private void ReorganizarCartasVisibles(Transform container, List<GameObject> handList)
     {
         int totalCards = handList.Count;
@@ -449,13 +544,15 @@ public class CartasManager : MonoBehaviour
         return true;
     }
 
-    public bool UsarLupa()
+    public bool UsarLupa(bool esJugador = true)
     {
         if (deck.Count == 0) return false;
         int nextCardIndex = deck[0];
         CardData nextCard = deckData[nextCardIndex];
         string valor = nextCard.isAce ? "As (11 o 1)" : nextCard.cardValue.ToString();
-        NotificacionManager.Instance.MostrarMensaje("Siguiente en mazo: " + valor, true, 3.5f);
+        
+        if (esJugador) NotificacionManager.Instance.MostrarMensaje("Siguiente en mazo: " + valor, true, 3.5f);
+        else NotificacionManager.Instance.MostrarMensaje("El Dealer usa una Lupa para ver la baraja...", true, 2.5f);
         return true;
     }
 }
