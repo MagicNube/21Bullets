@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nombre: Verdugo
   spriteRival: {fileID: 3627130487054926999, guid: 5e2321f54b65b5e47869a78f1f2324c8, type: 3}
-  vidasMaximas: 0
+  vidasMaximas: 3
   umbralPlantadoBlackjack: 15
   puedeUsarObjetos: 1
