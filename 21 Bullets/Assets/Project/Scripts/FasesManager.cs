@@ -28,7 +28,7 @@ public class FasesManager : MonoBehaviour
     public Sprite spriteProtagonista;
     public EnemigoData[] listaEnemigos;
     public int indiceEnemigoActual = 0;
-    
+
 
     private bool primerMensajeCartasMostrado = false;
 
@@ -159,6 +159,9 @@ public class FasesManager : MonoBehaviour
         contenedorCartas.SetActive(false);
         contenedorDisparo.SetActive(false);
         NotificacionManager.Instance.OcultarMensaje();
+
+        if (cartasManager.textoPuntosJugador != null) cartasManager.textoPuntosJugador.text = "0";
+        if (cartasManager.textoPuntosDealer != null) cartasManager.textoPuntosDealer.text = "0 + ?";
 
         disparoManager.PrepararNuevaRonda();
         int numReales = disparoManager.ObtenerTotalRealesCalculadas();
