@@ -17,7 +17,7 @@ public class IntroAnimacionManager : MonoBehaviour
 
     [Header("Ajustes")]
     public float tiempoFade = 0.8f;
-    public float esperaCentro = 2.5f;
+    public float esperaCentro = 2.0f;
     public float distanciaEntrada = 1000f;
 
     private Vector2 posOriginalJugador;
