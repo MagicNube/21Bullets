@@ -7655,7 +7655,8 @@ MonoBehaviour:
   panelOpciones: {fileID: 603836645}
   panelCreditos: {fileID: 988042600}
   textoCabeceraCreditos: {fileID: 929242609}
-  nombreEscenaJuego: MAIN
+  nombreEscenaJuego: 03_MAIN
+  nombreEscenaMenu: 02_MENU
   sonidoClick: {fileID: 8300000, guid: c8d37a9c2e8d9a849b286679a139afee, type: 3}
 --- !u!1 &1590426272
 GameObject:

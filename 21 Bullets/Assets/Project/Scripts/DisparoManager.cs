@@ -43,10 +43,9 @@ public class DisparoManager : MonoBehaviour
     private int vidasJugador = 3;
     public int vidasDealer = 3;
     public int vidasMaximasDealer = 3;
-    
-    private bool turnoTerminado = false;
+
     private bool volverAFaseCartas = false;
-    
+
     public bool turnoDelJugadorActual = false;
     private bool polvoraActivaJugador = false;
     private bool polvoraActivaDealer = false;
@@ -85,7 +84,7 @@ public class DisparoManager : MonoBehaviour
         vidasDealer = vidasMaximasEnemigo;
         vidasMaximasDealer = vidasMaximasEnemigo;
         ActualizarCorazonesUI();
-        
+
         tambor.Clear();
         indiceActual = 0;
         polvoraActivaJugador = false;
@@ -94,10 +93,9 @@ public class DisparoManager : MonoBehaviour
         esposasActivasDealer = false;
         jugadorInmuneAEsposas = false;
         dealerInmuneAEsposas = false;
-        turnoTerminado = false;
         volverAFaseCartas = false;
         objetosUsadosEsteDisparo = 0;
-        
+
         ActualizarContadoresTexto(0, 0);
     }
 
@@ -141,7 +139,7 @@ public class DisparoManager : MonoBehaviour
 
     public int ObtenerTotalRealesCalculadas() { return totalRealesCalculadas; }
     public int ObtenerTotalFogueosCalculadas() { return totalFogueosCalculadas; }
-    public bool BalaActualEsReal() { if(indiceActual < tambor.Count) return tambor[indiceActual]; return false; }
+    public bool BalaActualEsReal() { if (indiceActual < tambor.Count) return tambor[indiceActual]; return false; }
 
     public void IniciarFase(bool turnoJugador)
     {
@@ -165,56 +163,6 @@ public class DisparoManager : MonoBehaviour
         NotificacionManager.Instance.MostrarMensaje(turnoDelJugadorActual ? "TU TURNO" : "TURNO DEL DEALER", true, 2.5f);
 
         if (!turnoDelJugadorActual && dealerIA != null) dealerIA.IniciarTurno();
-    }
-
-    void Update()
-    {
-        if (turnoTerminado && Input.GetMouseButtonDown(0))
-        {
-            turnoTerminado = false;
-
-            if (vidasJugador <= 0)
-            {
-                NotificacionManager.Instance.MostrarMensaje("HAS MUERTO. GAME OVER", false);
-            }
-            else if (vidasDealer <= 0)
-            {
-                NotificacionManager.Instance.MostrarMensaje("¡ENEMIGO DERROTADO!", true, 2.5f);
-                if (objetoPistola != null) objetoPistola.SetActive(false);
-                if (estacionBalas != null) estacionBalas.Ocultar();
-                fasesManager.VictoriaSobreEnemigo();
-            }
-            else if (indiceActual >= tambor.Count)
-            {
-                if (objetoPistola != null) objetoPistola.SetActive(false);
-                if (estacionBalas != null) estacionBalas.Ocultar();
-                fasesManager.ReiniciarRondaCompleta();
-            }
-            else if (volverAFaseCartas)
-            {
-                if (objetoPistola != null) objetoPistola.SetActive(false);
-                if (estacionBalas != null) estacionBalas.Ocultar();
-                fasesManager.IniciarFaseCartas();
-            }
-            else
-            {
-                if (animadorPistola != null) animadorPistola.Play("Pistola_Reposo");
-
-                if (turnoDelJugadorActual)
-                {
-                    jugadorInmuneAEsposas = false;
-                    SetInteractuable(true);
-                    NotificacionManager.Instance.MostrarMensaje("TU TURNO", true, 2.5f);
-                }
-                else
-                {
-                    dealerInmuneAEsposas = false;
-                    SetInteractuable(false);
-                    NotificacionManager.Instance.MostrarMensaje("TURNO DEL DEALER", true, 2.5f);
-                    if (dealerIA != null) dealerIA.IniciarTurno();
-                }
-            }
-        }
     }
 
     public int ObtenerRealesRestantes()
@@ -247,7 +195,7 @@ public class DisparoManager : MonoBehaviour
 
         int danoMultiplicador = polvoraActivaDealer ? 2 : 1;
         polvoraActivaDealer = false;
-        
+
         objetosUsadosEsteDisparo = 0;
 
         if (dispararAJugador)
@@ -256,11 +204,11 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasJugador -= danoMultiplicador;
                 ActualizarCorazonesUI();
-                
+
                 if (esposasActivasDealer)
                 {
                     esposasActivasDealer = false;
-                    turnoDelJugadorActual = false; 
+                    turnoDelJugadorActual = false;
                     jugadorInmuneAEsposas = true;
                     FinalizarTurno(tamborVacio ? "¡BALA REAL! (Jugador esposado)" : "¡BALA REAL! Estás esposado, el Dealer mantiene el turno.", false);
                 }
@@ -292,11 +240,11 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasDealer -= danoMultiplicador;
                 ActualizarCorazonesUI();
-                
+
                 if (esposasActivasDealer)
                 {
                     esposasActivasDealer = false;
-                    turnoDelJugadorActual = false; 
+                    turnoDelJugadorActual = false;
                     jugadorInmuneAEsposas = true;
                     FinalizarTurno(tamborVacio ? "¡BALA REAL! (Jugador esposado)" : "¡BALA REAL al Dealer! Dealer mantiene el turno por esposas.", false);
                 }
@@ -338,7 +286,7 @@ public class DisparoManager : MonoBehaviour
         bool tamborVacio = (indiceActual >= tambor.Count);
 
         int danoMultiplicador = polvoraActivaJugador ? 2 : 1;
-        polvoraActivaJugador = false; 
+        polvoraActivaJugador = false;
 
         objetosUsadosEsteDisparo = 0;
 
@@ -348,11 +296,11 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasJugador -= danoMultiplicador;
                 ActualizarCorazonesUI();
-                
+
                 if (esposasActivasJugador)
                 {
                     esposasActivasJugador = false;
-                    turnoDelJugadorActual = true; 
+                    turnoDelJugadorActual = true;
                     dealerInmuneAEsposas = true;
                     FinalizarTurno(tamborVacio ? "¡BALA REAL! (Dealer esposado)" : "¡BALA REAL! Dealer esposado, mantienes el turno.", false);
                 }
@@ -378,7 +326,7 @@ public class DisparoManager : MonoBehaviour
                 if (esposasActivasJugador)
                 {
                     esposasActivasJugador = false;
-                    turnoDelJugadorActual = true; 
+                    turnoDelJugadorActual = true;
                     dealerInmuneAEsposas = true;
                     FinalizarTurno(tamborVacio ? "¡BALA REAL! (Dealer esposado)" : "¡BALA REAL! Dealer esposado, mantienes el turno.", false);
                 }
@@ -393,7 +341,7 @@ public class DisparoManager : MonoBehaviour
                 if (esposasActivasJugador)
                 {
                     esposasActivasJugador = false;
-                    turnoDelJugadorActual = true; 
+                    turnoDelJugadorActual = true;
                     dealerInmuneAEsposas = true;
                     FinalizarTurno(tamborVacio ? "¡FOGUEO! (Dealer esposado)" : "¡FOGUEO! Dealer esposado, mantienes el turno.", false);
                 }
@@ -432,12 +380,61 @@ public class DisparoManager : MonoBehaviour
         return esReal;
     }
 
+    // --- AHORA TERMINAR EL TURNO USA CORRUTINAS AUTOMÁTICAS ---
     private void FinalizarTurno(string mensaje, bool volverACartas)
     {
         volverAFaseCartas = volverACartas;
-        NotificacionManager.Instance.MostrarMensaje(mensaje + "\n(Click para continuar)", false);
+        NotificacionManager.Instance.MostrarMensaje(mensaje, true, 2.5f);
         SetInteractuable(false);
-        turnoTerminado = true;
+        StartCoroutine(RutinaTransicionTurno());
+    }
+
+    private IEnumerator RutinaTransicionTurno()
+    {
+        // Esperamos a que el jugador lea el mensaje del disparo
+        yield return new WaitForSeconds(2.5f);
+
+        if (vidasJugador <= 0)
+        {
+            fasesManager.JugadorHaMuerto();
+        }
+        else if (vidasDealer <= 0)
+        {
+            NotificacionManager.Instance.MostrarMensaje("¡ENEMIGO DERROTADO!", true, 2.5f);
+            if (objetoPistola != null) objetoPistola.SetActive(false);
+            if (estacionBalas != null) estacionBalas.Ocultar();
+            fasesManager.VictoriaSobreEnemigo();
+        }
+        else if (indiceActual >= tambor.Count)
+        {
+            if (objetoPistola != null) objetoPistola.SetActive(false);
+            if (estacionBalas != null) estacionBalas.Ocultar();
+            fasesManager.ReiniciarRondaCompleta();
+        }
+        else if (volverAFaseCartas)
+        {
+            if (objetoPistola != null) objetoPistola.SetActive(false);
+            if (estacionBalas != null) estacionBalas.Ocultar();
+            fasesManager.IniciarFaseCartas();
+        }
+        else
+        {
+            if (animadorPistola != null) animadorPistola.Play("Pistola_Reposo");
+
+            if (turnoDelJugadorActual)
+            {
+                jugadorInmuneAEsposas = false;
+                SetInteractuable(true);
+                NotificacionManager.Instance.MostrarMensaje("TU TURNO", true, 2.5f);
+            }
+            else
+            {
+                dealerInmuneAEsposas = false;
+                SetInteractuable(false);
+                NotificacionManager.Instance.MostrarMensaje("TURNO DEL DEALER", true, 2.5f);
+                if (dealerIA != null) dealerIA.IniciarTurno();
+            }
+        }
     }
 
     private void ActualizarCorazonesUI()
@@ -471,11 +468,11 @@ public class DisparoManager : MonoBehaviour
     {
         if (indiceActual >= tambor.Count) return false;
         bool esReal = tambor[indiceActual];
-        if (esJugador) 
+        if (esJugador)
         {
             NotificacionManager.Instance.MostrarMensaje(esReal ? "Lupa: La siguiente bala es REAL" : "Lupa: La siguiente bala es FOGUEO", true, 3.5f);
         }
-        else 
+        else
         {
             NotificacionManager.Instance.MostrarMensaje("El Dealer usa una Lupa...", true, 2.5f);
             if (dealerIA != null) dealerIA.RecibirInfoLupa(esReal);
@@ -487,7 +484,7 @@ public class DisparoManager : MonoBehaviour
     {
         if (esJugador)
         {
-            if (vidasJugador >= corazonesJugador.Length) 
+            if (vidasJugador >= corazonesJugador.Length)
             {
                 NotificacionManager.Instance.MostrarMensaje("Salud al máximo. No se puede usar.", true, 2f);
                 return false;
@@ -527,7 +524,7 @@ public class DisparoManager : MonoBehaviour
     {
         if (esJugador)
         {
-            if (esposasActivasJugador) 
+            if (esposasActivasJugador)
             {
                 NotificacionManager.Instance.MostrarMensaje("El Dealer ya está inmovilizado.", true, 2f);
                 return false;
@@ -553,12 +550,12 @@ public class DisparoManager : MonoBehaviour
     {
         if (indiceActual >= tambor.Count) return false;
         tambor[indiceActual] = !tambor[indiceActual];
-        if (esJugador) 
+        if (esJugador)
         {
             if (dealerIA != null) dealerIA.ForzarOlvidoBala();
             NotificacionManager.Instance.MostrarMensaje("Inversor: La polaridad de la bala actual se ha invertido.", true, 3f);
         }
-        else 
+        else
         {
             NotificacionManager.Instance.MostrarMensaje("El Dealer invierte la polaridad de la bala...", true, 2.5f);
             if (dealerIA != null) dealerIA.InvertirConocimientoBala();
@@ -569,7 +566,7 @@ public class DisparoManager : MonoBehaviour
     public bool UsarTelefono(bool esJugador)
     {
         if (indiceActual >= tambor.Count) return false;
-        
+
         int targetIndex = UnityEngine.Random.Range(indiceActual, tambor.Count);
         bool esReal = tambor[targetIndex];
 
@@ -597,19 +594,19 @@ public class DisparoManager : MonoBehaviour
     private IEnumerator RutinaMuñeco(bool esJugador)
     {
         SetInteractuable(false);
-        if (animadorPistola != null) animadorPistola.Play("Pistola_Reposo"); 
+        if (animadorPistola != null) animadorPistola.Play("Pistola_Reposo");
         yield return new WaitForSeconds(0.5f);
 
         if (dealerIA != null) dealerIA.ForzarOlvidoBala();
 
         bool esReal = EjecutarDisparoLogico();
-        objetosUsadosEsteDisparo = 0; 
+        objetosUsadosEsteDisparo = 0;
 
         if (esJugador)
         {
             string msg = esReal ? "¡BALA REAL al muñeco!" : "¡FOGUEO al muñeco!";
             NotificacionManager.Instance.MostrarMensaje($"{msg} Mantienes el turno.", true, 3f);
-            polvoraActivaJugador = false; 
+            polvoraActivaJugador = false;
         }
         else
         {

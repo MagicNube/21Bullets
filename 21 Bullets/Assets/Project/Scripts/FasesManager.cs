@@ -29,7 +29,6 @@ public class FasesManager : MonoBehaviour
     public EnemigoData[] listaEnemigos;
     private int indiceEnemigoActual = 0;
 
-    private bool juegoIniciado = false;
     private bool primerMensajeCartasMostrado = false;
 
     void Start()
@@ -59,7 +58,6 @@ public class FasesManager : MonoBehaviour
     private IEnumerator RutinaInicioJuego()
     {
         yield return new WaitForSeconds(1.0f);
-        juegoIniciado = true;
         PrepararSiguienteEnemigo();
     }
 

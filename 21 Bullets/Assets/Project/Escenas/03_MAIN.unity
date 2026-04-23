@@ -565,7 +565,8 @@ MonoBehaviour:
   panelOpciones: {fileID: 0}
   panelCreditos: {fileID: 1582571427}
   textoCabeceraCreditos: {fileID: 586478733}
-  nombreEscenaJuego: 
+  nombreEscenaJuego: 03_MAIN
+  nombreEscenaMenu: "02_MEN\xDA"
   sonidoClick: {fileID: 0}
 --- !u!1 &155338626
 GameObject:

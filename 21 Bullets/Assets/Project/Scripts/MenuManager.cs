@@ -8,12 +8,14 @@ public class MenuManager : MonoBehaviour
     public GameObject panelOpciones;
     public GameObject panelCreditos;
     public TextMeshProUGUI textoCabeceraCreditos;
+
+    [Header("Configuracion de Escenas")]
     public string nombreEscenaJuego;
+    public string nombreEscenaMenu;
 
     public AudioClip sonidoClick;
     private AudioSource audioSource;
 
-    // Esta variable guardará tus nombres y agradecimientos
     private string contenidoOriginalCreditos;
 
     void Start()
@@ -24,7 +26,6 @@ public class MenuManager : MonoBehaviour
         if (panelOpciones != null) panelOpciones.SetActive(false);
         if (panelCreditos != null) panelCreditos.SetActive(false);
 
-        // MUY IMPORTANTE: Guardamos el texto que escribiste en el Inspector al arrancar
         if (textoCabeceraCreditos != null)
         {
             contenidoOriginalCreditos = textoCabeceraCreditos.text;
@@ -42,9 +43,13 @@ public class MenuManager : MonoBehaviour
             else if (panelCreditos != null && panelCreditos.activeSelf)
             {
                 if (SceneManager.GetActiveScene().name == nombreEscenaJuego)
-                    ReiniciarPartida();
+                {
+                    VolverAlMenu();
+                }
                 else
+                {
                     CerrarCreditos();
+                }
             }
         }
     }
@@ -61,7 +66,6 @@ public class MenuManager : MonoBehaviour
                     "<size=150%><b><color=#A30000>¡VICTORIA!</color></b></size>" :
                     "<size=150%><b><color=#555555>HAS CAÍDO...</color></b></size>";
 
-                // Juntamos el título dinámico con tus créditos originales
                 textoCabeceraCreditos.text = titulo + "\n\n" + contenidoOriginalCreditos;
             }
 
@@ -79,16 +83,19 @@ public class MenuManager : MonoBehaviour
             panelCreditos.SetActive(true);
             if (textoCabeceraCreditos != null)
             {
-                // Juntamos el nombre del juego con tus créditos originales
                 textoCabeceraCreditos.text = "<size=150%><b><color=#A30000>21 BULLETS</color></b></size>\n\n" + contenidoOriginalCreditos;
             }
         }
     }
 
-    public void ReiniciarPartida()
+    public void VolverAlMenu()
     {
         if (sonidoClick != null && audioSource != null) audioSource.PlayOneShot(sonidoClick);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        if (!string.IsNullOrEmpty(nombreEscenaMenu))
+        {
+            SceneManager.LoadScene(nombreEscenaMenu);
+        }
     }
 
     public void BotonJugar()

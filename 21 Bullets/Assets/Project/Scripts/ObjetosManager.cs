@@ -5,7 +5,7 @@ using UnityEngine;
 
 public enum TipoObjeto
 {
-    Botiquin, Esposas, Guante, Inversor, Lupa, 
+    Botiquin, Esposas, Guante, Inversor, Lupa,
     Muñeco, Polvora, RayosX, Telefono, Tijeras
 }
 
@@ -17,20 +17,20 @@ public class ObjetosManager : MonoBehaviour
     public CartasManager cartasManager;
     public DisparoManager disparoManager;
 
-    public Sprite[] spritesObjetos; 
-    public Transform[] slotsJugador; 
-    public Transform[] slotsDealer; 
+    public Sprite[] spritesObjetos;
+    public Transform[] slotsJugador;
+    public Transform[] slotsDealer;
 
-    public GameObject prefabObjetoAnimacion; 
-    public GameObject objetoCajaVisual; 
+    public GameObject prefabObjetoAnimacion;
+    public GameObject objetoCajaVisual;
     public SpriteRenderer spriteRendererCaja;
-    
+
     public Sprite spriteCajaCerrada;
     public Sprite spriteCajaAbierta;
-    
+
     public Transform posicionCajaJugador;
     public Transform posicionCajaDealer;
-    
+
     [Header("Cursores Especiales")]
     public Texture2D cursorManoCerrada;
     public Texture2D cursorManoApuntar;
@@ -38,13 +38,13 @@ public class ObjetosManager : MonoBehaviour
     public float distanciaInteraccion = 3.5f;
     public float duracionVuelo = 0.4f;
     public float tiempoEntreObjetos = 0.2f;
-    
+
     [HideInInspector]
     public bool enemigoRecibeObjetos = false;
 
     public GameObject[] objetosJugador = new GameObject[8];
     public GameObject[] objetosDealer = new GameObject[8];
-    public TipoObjeto[] tiposDealer = new TipoObjeto[8]; 
+    public TipoObjeto[] tiposDealer = new TipoObjeto[8];
 
     private int capacidadMaxima = 8;
     private bool esperandoClickCaja = false;
@@ -81,7 +81,7 @@ public class ObjetosManager : MonoBehaviour
                 if (oi != null)
                 {
                     bool usable = esMiTurno;
-                    
+
                     if (usable && enFaseCartas && cartasManager.objetosUsadosEnCartas >= 2) usable = false;
                     if (usable && enFaseDisparo && disparoManager.objetosUsadosEsteDisparo >= 1) usable = false;
 
@@ -90,15 +90,15 @@ public class ObjetosManager : MonoBehaviour
                         switch (oi.miTipo)
                         {
                             case TipoObjeto.Tijeras:
-                            case TipoObjeto.RayosX: 
-                                usable = enFaseCartas; 
+                            case TipoObjeto.RayosX:
+                                usable = enFaseCartas;
                                 break;
                             case TipoObjeto.Polvora:
                             case TipoObjeto.Inversor:
                             case TipoObjeto.Muñeco:
                             case TipoObjeto.Esposas:
                             case TipoObjeto.Telefono:
-                                usable = enFaseDisparo; 
+                                usable = enFaseDisparo;
                                 break;
                             case TipoObjeto.Lupa:
                             case TipoObjeto.Guante:
@@ -142,9 +142,10 @@ public class ObjetosManager : MonoBehaviour
     private TipoObjeto ObtenerObjetoAleatorioDealer()
     {
         TipoObjeto obj;
-        do {
+        do
+        {
             obj = (TipoObjeto)UnityEngine.Random.Range(0, 10);
-        } while (obj == TipoObjeto.RayosX); 
+        } while (obj == TipoObjeto.RayosX);
         return obj;
     }
 
@@ -171,7 +172,7 @@ public class ObjetosManager : MonoBehaviour
             if (slotLibre != -1)
             {
                 TipoObjeto nuevoObjeto = (TipoObjeto)UnityEngine.Random.Range(0, 10);
-                
+
                 GameObject objAnim = Instantiate(prefabObjetoAnimacion, posicionCajaJugador.position, Quaternion.identity);
                 objetosJugador[slotLibre] = objAnim;
 
@@ -205,10 +206,10 @@ public class ObjetosManager : MonoBehaviour
                 if (slotLibre != -1)
                 {
                     TipoObjeto nuevoObjeto = ObtenerObjetoAleatorioDealer();
-                    
+
                     GameObject objAnim = Instantiate(prefabObjetoAnimacion, posicionCajaDealer.position, Quaternion.identity);
                     objetosDealer[slotLibre] = objAnim;
-                    tiposDealer[slotLibre] = nuevoObjeto; 
+                    tiposDealer[slotLibre] = nuevoObjeto;
 
                     yield return StartCoroutine(AnimarObjetoVolando(objAnim, nuevoObjeto, slotsDealer[slotLibre], posicionCajaDealer.position, false));
                     yield return new WaitForSeconds(tiempoEntreObjetos);
@@ -252,7 +253,7 @@ public class ObjetosManager : MonoBehaviour
         {
             tiempo += Time.deltaTime;
             float t = tiempo / duracionVuelo;
-            t = t * t * (3f - 2f * t); 
+            t = t * t * (3f - 2f * t);
 
             objAnim.transform.position = Vector3.Lerp(posInicial, posFinal, t);
             yield return null;
@@ -311,21 +312,26 @@ public class ObjetosManager : MonoBehaviour
                 if (enFaseDisparo && posicionCajaDealer != null) objetivos.Add(posicionCajaDealer.gameObject);
                 break;
             case TipoObjeto.Tijeras:
-                if (enFaseCartas) {
-                    foreach (var card in cartasManager.playerCards) {
+                if (enFaseCartas)
+                {
+                    foreach (var card in cartasManager.playerCards)
+                    {
                         if (card != null) objetivos.Add(card);
                     }
                 }
                 break;
             case TipoObjeto.RayosX:
-                if (enFaseCartas) {
+                if (enFaseCartas)
+                {
                     GameObject oculta = cartasManager.ObtenerCartaOculta();
                     if (oculta != null) objetivos.Add(oculta);
                 }
                 break;
             case TipoObjeto.Guante:
-                for (int i = 0; i < objetosDealer.Length; i++) {
-                    if (objetosDealer[i] != null && EsObjetoRobableYUsable(tiposDealer[i], true)) {
+                for (int i = 0; i < objetosDealer.Length; i++)
+                {
+                    if (objetosDealer[i] != null && EsObjetoRobableYUsable(tiposDealer[i], true))
+                    {
                         objetivos.Add(objetosDealer[i]);
                     }
                 }
@@ -335,10 +341,13 @@ public class ObjetosManager : MonoBehaviour
         foreach (GameObject obj in objetivos)
         {
             if (obj == null) continue;
-            
-            if (resaltar) {
+
+            if (resaltar)
+            {
                 if (obj.GetComponent<EfectoLatido>() == null) obj.AddComponent<EfectoLatido>();
-            } else {
+            }
+            else
+            {
                 EfectoLatido latido = obj.GetComponent<EfectoLatido>();
                 if (latido != null) Destroy(latido);
             }
@@ -466,7 +475,7 @@ public class ObjetosManager : MonoBehaviour
                 if (enFaseDisparo) usado = disparoManager.UsarMuñeco(true);
                 break;
             case TipoObjeto.Telefono:
-                if (enFaseDisparo) usado = disparoManager.UsarTelefono(true); 
+                if (enFaseDisparo) usado = disparoManager.UsarTelefono(true);
                 break;
             case TipoObjeto.Guante:
                 usado = UsarGuanteJugador(obj.transform.position);
@@ -584,6 +593,7 @@ public class ObjetosManager : MonoBehaviour
         return false;
     }
 
+    // --- NUEVA LÓGICA ANIMADA PARA EL DEALER ---
     public void IntentarUsarObjetoDealer(TipoObjeto tipo)
     {
         bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
@@ -603,8 +613,46 @@ public class ObjetosManager : MonoBehaviour
         }
         if (index == -1) return;
 
-        bool usado = false;
+        StartCoroutine(RutinaAnimarYUsarObjetoDealer(index, tipo));
+    }
 
+    private IEnumerator RutinaAnimarYUsarObjetoDealer(int index, TipoObjeto tipo)
+    {
+        GameObject obj = objetosDealer[index];
+        objetosDealer[index] = null; // Lo sacamos del array para que no lo vuelva a usar
+
+        Vector3 posInicial = obj.transform.position;
+        // Posición central, usando la cámara para calcular el centro exacto en pantalla 2D
+        Vector3 posCentro = Camera.main != null ? new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, 0f) : Vector3.zero;
+
+        Vector3 escalaInicial = obj.transform.localScale;
+        Vector3 escalaFinal = escalaInicial * 2.5f;
+
+        // Lo ponemos por encima de todo
+        SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+        if (sr != null) sr.sortingOrder = 50;
+
+        float duracion = 0.5f;
+        float t = 0;
+
+        // Animación de viaje al centro y crecimiento
+        while (t < 1f)
+        {
+            t += Time.deltaTime / duracion;
+            float easedT = t * t * (3f - 2f * t);
+            obj.transform.position = Vector3.Lerp(posInicial, posCentro, easedT);
+            obj.transform.localScale = Vector3.Lerp(escalaInicial, escalaFinal, easedT);
+            yield return null;
+        }
+
+        // Se queda en el centro un momento para que veamos qué va a usar
+        yield return new WaitForSeconds(0.6f);
+
+        bool usado = false;
+        bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
+        bool enFaseDisparo = fasesManager.contenedorDisparo.activeSelf;
+
+        // Aplicamos el efecto real
         switch (tipo)
         {
             case TipoObjeto.Botiquin: usado = disparoManager.UsarBotiquin(false); break;
@@ -625,10 +673,18 @@ public class ObjetosManager : MonoBehaviour
         {
             if (enFaseCartas) cartasManager.objetosUsadosEnCartas++;
             if (enFaseDisparo) disparoManager.objetosUsadosEsteDisparo++;
-
-            Destroy(objetosDealer[index]);
-            objetosDealer[index] = null;
         }
+
+        // Animación rápida de desaparecer
+        t = 0;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / 0.2f;
+            obj.transform.localScale = Vector3.Lerp(escalaFinal, Vector3.zero, t);
+            yield return null;
+        }
+
+        Destroy(obj);
     }
 
     private bool UsarGuanteDealer()
