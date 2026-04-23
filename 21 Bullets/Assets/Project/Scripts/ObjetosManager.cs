@@ -41,6 +41,9 @@ public class ObjetosManager : MonoBehaviour
 
     [HideInInspector]
     public bool enemigoRecibeObjetos = false;
+    
+    [HideInInspector]
+    public bool repartiendoObjetos = false;
 
     public GameObject[] objetosJugador = new GameObject[8];
     public GameObject[] objetosDealer = new GameObject[8];
@@ -82,31 +85,39 @@ public class ObjetosManager : MonoBehaviour
                 {
                     bool usable = esMiTurno;
 
-                    if (usable && enFaseCartas && cartasManager.objetosUsadosEnCartas >= 2) usable = false;
-                    if (usable && enFaseDisparo && disparoManager.objetosUsadosEsteDisparo >= 1) usable = false;
-
-                    if (usable)
+                    if (repartiendoObjetos)
                     {
-                        switch (oi.miTipo)
+                        usable = true;
+                    }
+                    else
+                    {
+                        if (usable && enFaseCartas && cartasManager.objetosUsadosEnCartas >= 2) usable = false;
+                        if (usable && enFaseDisparo && disparoManager.objetosUsadosEsteDisparo >= 1) usable = false;
+
+                        if (usable)
                         {
-                            case TipoObjeto.Tijeras:
-                            case TipoObjeto.RayosX:
-                                usable = enFaseCartas;
-                                break;
-                            case TipoObjeto.Polvora:
-                            case TipoObjeto.Inversor:
-                            case TipoObjeto.Muñeco:
-                            case TipoObjeto.Esposas:
-                            case TipoObjeto.Telefono:
-                                usable = enFaseDisparo;
-                                break;
-                            case TipoObjeto.Lupa:
-                            case TipoObjeto.Guante:
-                            case TipoObjeto.Botiquin:
-                                usable = true;
-                                break;
+                            switch (oi.miTipo)
+                            {
+                                case TipoObjeto.Tijeras:
+                                case TipoObjeto.RayosX:
+                                    usable = enFaseCartas;
+                                    break;
+                                case TipoObjeto.Polvora:
+                                case TipoObjeto.Inversor:
+                                case TipoObjeto.Muñeco:
+                                case TipoObjeto.Esposas:
+                                case TipoObjeto.Telefono:
+                                    usable = enFaseDisparo;
+                                    break;
+                                case TipoObjeto.Lupa:
+                                case TipoObjeto.Guante:
+                                case TipoObjeto.Botiquin:
+                                    usable = true;
+                                    break;
+                            }
                         }
                     }
+                    
                     oi.SetActivo(usable);
                 }
             }
@@ -151,6 +162,8 @@ public class ObjetosManager : MonoBehaviour
 
     private IEnumerator RutinaRepartirObjetos(Action onTerminado)
     {
+        repartiendoObjetos = true;
+
         int cantidadARepartir = UnityEngine.Random.Range(2, 5);
 
         if (objetoCajaVisual != null && posicionCajaJugador != null)
@@ -171,7 +184,6 @@ public class ObjetosManager : MonoBehaviour
             int slotLibre = ObtenerSlotLibre(objetosJugador);
             if (slotLibre != -1)
             {
-                // AHORA TIRA EL DADO HASTA QUE NO SEA GUANTE (SI ESTAMOS EN LA RONDA 0)
                 TipoObjeto nuevoObjeto;
                 do
                 {
@@ -225,6 +237,7 @@ public class ObjetosManager : MonoBehaviour
             if (objetoCajaVisual != null) objetoCajaVisual.SetActive(false);
         }
 
+        repartiendoObjetos = false;
         onTerminado?.Invoke();
     }
 
@@ -598,7 +611,6 @@ public class ObjetosManager : MonoBehaviour
         return false;
     }
 
-    // --- NUEVA LÓGICA ANIMADA PARA EL DEALER ---
     public void IntentarUsarObjetoDealer(TipoObjeto tipo)
     {
         bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
@@ -624,23 +636,20 @@ public class ObjetosManager : MonoBehaviour
     private IEnumerator RutinaAnimarYUsarObjetoDealer(int index, TipoObjeto tipo)
     {
         GameObject obj = objetosDealer[index];
-        objetosDealer[index] = null; // Lo sacamos del array para que no lo vuelva a usar
+        objetosDealer[index] = null; 
 
         Vector3 posInicial = obj.transform.position;
-        // Posición central, usando la cámara para calcular el centro exacto en pantalla 2D
         Vector3 posCentro = Camera.main != null ? new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, 0f) : Vector3.zero;
 
         Vector3 escalaInicial = obj.transform.localScale;
         Vector3 escalaFinal = escalaInicial * 2.5f;
 
-        // Lo ponemos por encima de todo
         SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
         if (sr != null) sr.sortingOrder = 50;
 
         float duracion = 0.5f;
         float t = 0;
 
-        // Animación de viaje al centro y crecimiento
         while (t < 1f)
         {
             t += Time.deltaTime / duracion;
@@ -650,14 +659,12 @@ public class ObjetosManager : MonoBehaviour
             yield return null;
         }
 
-        // Se queda en el centro un momento para que veamos qué va a usar
         yield return new WaitForSeconds(0.6f);
 
         bool usado = false;
         bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
         bool enFaseDisparo = fasesManager.contenedorDisparo.activeSelf;
 
-        // Aplicamos el efecto real
         switch (tipo)
         {
             case TipoObjeto.Botiquin: usado = disparoManager.UsarBotiquin(false); break;
@@ -680,7 +687,6 @@ public class ObjetosManager : MonoBehaviour
             if (enFaseDisparo) disparoManager.objetosUsadosEsteDisparo++;
         }
 
-        // Animación rápida de desaparecer
         t = 0;
         while (t < 1f)
         {

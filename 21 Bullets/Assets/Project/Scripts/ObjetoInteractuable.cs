@@ -37,7 +37,7 @@ public class ObjetoInteractuable : MonoBehaviour
         if (sr != null)
         {
             Color c = colorOriginal;
-            if (!activo) c.a = 0.3f; 
+            if (!activo) c.a = 0.6f; 
             sr.color = c;
         }
     }
