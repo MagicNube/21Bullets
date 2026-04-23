@@ -145,7 +145,7 @@ public class ObjetosManager : MonoBehaviour
         do
         {
             obj = (TipoObjeto)UnityEngine.Random.Range(0, 10);
-        } while (obj == TipoObjeto.RayosX);
+        } while (obj == TipoObjeto.RayosX || (fasesManager.indiceEnemigoActual == 0 && obj == TipoObjeto.Guante));
         return obj;
     }
 
@@ -171,7 +171,12 @@ public class ObjetosManager : MonoBehaviour
             int slotLibre = ObtenerSlotLibre(objetosJugador);
             if (slotLibre != -1)
             {
-                TipoObjeto nuevoObjeto = (TipoObjeto)UnityEngine.Random.Range(0, 10);
+                // AHORA TIRA EL DADO HASTA QUE NO SEA GUANTE (SI ESTAMOS EN LA RONDA 0)
+                TipoObjeto nuevoObjeto;
+                do
+                {
+                    nuevoObjeto = (TipoObjeto)UnityEngine.Random.Range(0, 10);
+                } while (fasesManager.indiceEnemigoActual == 0 && nuevoObjeto == TipoObjeto.Guante);
 
                 GameObject objAnim = Instantiate(prefabObjetoAnimacion, posicionCajaJugador.position, Quaternion.identity);
                 objetosJugador[slotLibre] = objAnim;
