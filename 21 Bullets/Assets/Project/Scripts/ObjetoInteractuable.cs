@@ -74,14 +74,14 @@ public class ObjetoInteractuable : MonoBehaviour
         {
             case TipoObjeto.Botiquin: return "Botiquín: Recupera 1 vida.";
             case TipoObjeto.Esposas: return "Esposas: El enemigo pierde su próximo turno.";
-            case TipoObjeto.Guante: return "Guante: Roba un objeto aleatorio del rival.";
+            case TipoObjeto.Guante: return "Guante: Roba un objeto a elegir del rival y se usa.";
             case TipoObjeto.Inversor: return "Inversor: Cambia la bala de Real a Fogueo o viceversa.";
             case TipoObjeto.Lupa: return "Lupa: Revela la carta de arriba del mazo o la bala actual.";
             case TipoObjeto.Muñeco: return "Vudú: Dispara una bala al muñeco y mantén el turno.";
             case TipoObjeto.Polvora: return "Pólvora: El siguiente disparo hará doble daño.";
             case TipoObjeto.RayosX: return "Rayos X: Revela la carta oculta del Dealer.";
             case TipoObjeto.Telefono: return "Teléfono: Te revela la posición de una bala.";
-            case TipoObjeto.Tijeras: return "Tijeras: Elimina tu última carta pedida.";
+            case TipoObjeto.Tijeras: return "Tijeras: Elimina una carta a elegir.";
             default: return "";
         }
     }
