@@ -10,7 +10,7 @@ public class SplashManager : MonoBehaviour
     public RectTransform contenedorFlotante;
     public Animator animador21;
     public Animator animadorBullets;
-    public RectTransform balaVisual;
+    public RectTransform[] decoraciones;
     public CanvasGroup pantallazoFlash;
     public Camera camaraPrincipal;
 
@@ -39,7 +39,10 @@ public class SplashManager : MonoBehaviour
             posInicialContenedor = contenedorFlotante.anchoredPosition;
         }
 
-        balaVisual.gameObject.SetActive(false);
+        for (int i = 0; i < decoraciones.Length; i++)
+        {
+            decoraciones[i].gameObject.SetActive(false);
+        }
         pantallazoFlash.alpha = 0f;
         panelSplashGroup.alpha = 1f;
 
@@ -73,7 +76,10 @@ public class SplashManager : MonoBehaviour
         if (sonidoDisparo != null) audioSource.PlayOneShot(sonidoDisparo);
 
         pantallazoFlash.alpha = 1f;
-        balaVisual.gameObject.SetActive(true);
+        for (int i = 0; i < decoraciones.Length; i++)
+        {
+            decoraciones[i].gameObject.SetActive(true);
+        }
         StartCoroutine(RutinaSacudidaCamara(0.3f, 0.5f));
 
         float t = 0f;
