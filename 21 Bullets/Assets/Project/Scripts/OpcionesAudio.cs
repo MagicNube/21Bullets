@@ -6,37 +6,48 @@ using UnityEngine.UI;
 public class OpcionesAudio : MonoBehaviour
 {
     public AudioMixer mezclador;
-    public Slider sliderVolumen;
+    
+    [Header("Sliders de Volumen")]
+    public Slider sliderMaster;
+    public Slider sliderMusica;
+    public Slider sliderSFX;
 
     void Start()
     {
-        float volumenGuardado = PlayerPrefs.GetFloat("VolumenMaster", 0.75f);
-        
-        if (sliderVolumen != null)
-        {
-            sliderVolumen.value = volumenGuardado;
-            sliderVolumen.onValueChanged.AddListener(CambiarVolumen);
-        }
-        
-        StartCoroutine(AplicarVolumenSeguro(volumenGuardado));
+        ConfigurarSlider(sliderMaster, "VolumenMaster");
+        ConfigurarSlider(sliderMusica, "VolumenMusica");
+        ConfigurarSlider(sliderSFX, "VolumenSFX");
     }
 
-    public void CambiarVolumen(float valor)
+    private void ConfigurarSlider(Slider slider, string parametroNombre)
     {
-        AplicarVolumen(valor);
-        PlayerPrefs.SetFloat("VolumenMaster", valor);
+        if (slider != null)
+        {
+            float volumenGuardado = PlayerPrefs.GetFloat(parametroNombre, 0.75f);
+            slider.value = volumenGuardado;
+            
+            slider.onValueChanged.AddListener((valor) => CambiarVolumen(parametroNombre, valor));
+            
+            StartCoroutine(AplicarVolumenSeguro(parametroNombre, volumenGuardado));
+        }
+    }
+
+    public void CambiarVolumen(string parametroNombre, float valor)
+    {
+        AplicarVolumen(parametroNombre, valor);
+        PlayerPrefs.SetFloat(parametroNombre, valor);
         PlayerPrefs.Save();
     }
 
-    private void AplicarVolumen(float valor)
+    private void AplicarVolumen(string parametroNombre, float valor)
     {
         float volumenEnDecibelios = Mathf.Log10(Mathf.Clamp(valor, 0.0001f, 1f)) * 20f;
-        mezclador.SetFloat("VolumenMaster", volumenEnDecibelios);
+        mezclador.SetFloat(parametroNombre, volumenEnDecibelios);
     }
 
-    private IEnumerator AplicarVolumenSeguro(float valor)
+    private IEnumerator AplicarVolumenSeguro(string parametroNombre, float valor)
     {
         yield return null; 
-        AplicarVolumen(valor);
+        AplicarVolumen(parametroNombre, valor);
     }
 }

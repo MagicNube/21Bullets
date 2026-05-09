@@ -42,13 +42,19 @@ public class MenuManager : MonoBehaviour
         }
 
         yield return null;
-
         if (grupoAudio != null)
         {
-            float volumenGuardado = PlayerPrefs.GetFloat("VolumenMaster", 0.75f);
-            float volumenEnDecibelios = Mathf.Log10(Mathf.Clamp(volumenGuardado, 0.0001f, 1f)) * 20f;
-            grupoAudio.audioMixer.SetFloat("VolumenMaster", volumenEnDecibelios);
+            CargarVolumenGuardado("VolumenMaster", 0.75f);
+            CargarVolumenGuardado("VolumenMusica", 0.75f);
+            CargarVolumenGuardado("VolumenSFX", 0.75f);
         }
+    }
+
+    private void CargarVolumenGuardado(string parametro, float valorPorDefecto)
+    {
+        float volumenGuardado = PlayerPrefs.GetFloat(parametro, valorPorDefecto);
+        float volumenEnDecibelios = Mathf.Log10(Mathf.Clamp(volumenGuardado, 0.0001f, 1f)) * 20f;
+        grupoAudio.audioMixer.SetFloat(parametro, volumenEnDecibelios);
     }
 
     void Update()

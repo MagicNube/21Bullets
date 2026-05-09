@@ -8,18 +8,27 @@ public class HoverSonido : MonoBehaviour, IPointerEnterHandler
 
     void Start()
     {
-        GameObject managersObj = GameObject.Find("MANAGERS");
-        if (managersObj != null)
+        MenuManager menuManager = Object.FindAnyObjectByType<MenuManager>();
+        if (menuManager != null) 
         {
-            audioSource = managersObj.GetComponent<AudioSource>();
+            audioSource = menuManager.GetComponent<AudioSource>();
         }
 
         if (audioSource == null)
         {
-            MenuManager menuManager = Object.FindAnyObjectByType<MenuManager>();
-            if (menuManager != null)
+            GameplayMenuManager gameplayManager = Object.FindAnyObjectByType<GameplayMenuManager>();
+            if (gameplayManager != null) 
             {
-                audioSource = menuManager.GetComponent<AudioSource>();
+                audioSource = gameplayManager.GetComponent<AudioSource>();
+            }
+        }
+
+        if (audioSource == null)
+        {
+            GameObject managersObj = GameObject.Find("MANAGERS");
+            if (managersObj != null) 
+            {
+                audioSource = managersObj.GetComponent<AudioSource>();
             }
         }
     }
