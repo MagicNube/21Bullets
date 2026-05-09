@@ -76,6 +76,10 @@ public class ObjetosManager : MonoBehaviour
 
         if (cartasManager.esperandoCorte) esMiTurno = false;
 
+        bool sinLimites = false;
+        if (DificultadManager.DificultadElegida == ModoDificultad.Normal) sinLimites = true;
+        else if (DificultadManager.DificultadElegida == ModoDificultad.Personalizado) sinLimites = DificultadManager.CP_SinLimitesObjetos;
+
         for (int i = 0; i < objetosJugador.Length; i++)
         {
             if (objetosJugador[i] != null)
@@ -91,8 +95,11 @@ public class ObjetosManager : MonoBehaviour
                     }
                     else
                     {
-                        if (usable && enFaseCartas && cartasManager.objetosUsadosEnCartas >= 2) usable = false;
-                        if (usable && enFaseDisparo && disparoManager.objetosUsadosEsteDisparo >= 1) usable = false;
+                        if (!sinLimites)
+                        {
+                            if (usable && enFaseCartas && cartasManager.objetosUsadosEnCartas >= 2) usable = false;
+                            if (usable && enFaseDisparo && disparoManager.objetosUsadosEsteDisparo >= 1) usable = false;
+                        }
 
                         if (usable)
                         {
@@ -166,6 +173,16 @@ public class ObjetosManager : MonoBehaviour
 
         int cantidadARepartir = UnityEngine.Random.Range(2, 5);
 
+        int cantidadJugador = cantidadARepartir;
+        if (DificultadManager.DificultadElegida == ModoDificultad.Dificil)
+        {
+            cantidadJugador = Mathf.Max(0, cantidadARepartir - 1);
+        }
+        else if (DificultadManager.DificultadElegida == ModoDificultad.Personalizado)
+        {
+            cantidadJugador = Mathf.Max(0, cantidadARepartir + DificultadManager.CP_DiferenciaObjetos);
+        }
+
         if (objetoCajaVisual != null && posicionCajaJugador != null)
         {
             objetoCajaVisual.transform.position = posicionCajaJugador.position;
@@ -179,7 +196,7 @@ public class ObjetosManager : MonoBehaviour
         if (spriteRendererCaja != null) spriteRendererCaja.sprite = spriteCajaAbierta;
         yield return new WaitForSeconds(0.4f);
 
-        for (int i = 0; i < cantidadARepartir; i++)
+        for (int i = 0; i < cantidadJugador; i++)
         {
             int slotLibre = ObtenerSlotLibre(objetosJugador);
             if (slotLibre != -1)
@@ -440,15 +457,22 @@ public class ObjetosManager : MonoBehaviour
             return false;
         }
 
-        if (enFaseCartas && cartasManager.objetosUsadosEnCartas >= 2)
+        bool sinLimites = false;
+        if (DificultadManager.DificultadElegida == ModoDificultad.Normal) sinLimites = true;
+        else if (DificultadManager.DificultadElegida == ModoDificultad.Personalizado) sinLimites = DificultadManager.CP_SinLimitesObjetos;
+
+        if (!sinLimites)
         {
-            NotificacionManager.Instance.MostrarMensaje("Límite de 2 objetos por mano.", true, 2f);
-            return false;
-        }
-        if (enFaseDisparo && disparoManager.objetosUsadosEsteDisparo >= 1)
-        {
-            NotificacionManager.Instance.MostrarMensaje("Límite de 1 objeto por disparo.", true, 2f);
-            return false;
+            if (enFaseCartas && cartasManager.objetosUsadosEnCartas >= 2)
+            {
+                NotificacionManager.Instance.MostrarMensaje("Límite de 2 objetos por mano.", true, 2f);
+                return false;
+            }
+            if (enFaseDisparo && disparoManager.objetosUsadosEsteDisparo >= 1)
+            {
+                NotificacionManager.Instance.MostrarMensaje("Límite de 1 objeto por disparo.", true, 2f);
+                return false;
+            }
         }
 
         if (!ComprobarZonaValida(obj.miTipo, obj.transform.position)) return false;

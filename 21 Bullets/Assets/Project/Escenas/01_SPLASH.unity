@@ -134,7 +134,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &316559430
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1050,7 +1050,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1858999423
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1195,7 +1195,6 @@ MonoBehaviour:
   animadorBullets: {fileID: 1026610935}
   decoraciones:
   - {fileID: 1098126230}
-  - {fileID: 316559430}
   pantallazoFlash: {fileID: 1858999424}
   camaraPrincipal: {fileID: 1023532553}
   nombreEscenaMenu: "02_MEN\xDA"

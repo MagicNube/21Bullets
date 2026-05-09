@@ -14,7 +14,10 @@ public class EstacionBalasControl : MonoBehaviour
     public void Desplegar()
     {
         estaDesplegado = true;
-        animator.Play("MarcoBalasDesplegar");
+        if (gameObject.activeInHierarchy)
+        {
+            animator.Play("MarcoBalasDesplegar");
+        }
     }
 
     public void Ocultar()
@@ -22,7 +25,10 @@ public class EstacionBalasControl : MonoBehaviour
         if (estaDesplegado)
         {
             estaDesplegado = false;
-            animator.Play("MarcoBalasOcultar");
+            if (gameObject.activeInHierarchy)
+            {
+                animator.Play("MarcoBalasOcultar");
+            }
         }
     }
 }

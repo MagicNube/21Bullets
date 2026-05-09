@@ -80,7 +80,22 @@ public class DisparoManager : MonoBehaviour
 
     public void ResetPartidaCompleta(int vidasMaximasEnemigo)
     {
-        vidasJugador = corazonesJugador.Length;
+        bool esPrimerEnemigo = (fasesManager != null && fasesManager.indiceEnemigoActual == 0);
+
+        if (esPrimerEnemigo)
+        {
+            vidasJugador = corazonesJugador.Length;
+        }
+        else
+        {
+            int curacion = 0;
+            if (DificultadManager.DificultadElegida == ModoDificultad.Normal) curacion = corazonesJugador.Length;
+            else if (DificultadManager.DificultadElegida == ModoDificultad.Dificil) curacion = 2;
+            else curacion = DificultadManager.CP_VidasIniciales;
+
+            vidasJugador = Mathf.Clamp(vidasJugador + curacion, 1, corazonesJugador.Length);
+        }
+
         vidasDealer = vidasMaximasEnemigo;
         vidasMaximasDealer = vidasMaximasEnemigo;
         ActualizarCorazonesUI();
@@ -95,6 +110,8 @@ public class DisparoManager : MonoBehaviour
         dealerInmuneAEsposas = false;
         volverAFaseCartas = false;
         objetosUsadosEsteDisparo = 0;
+
+        if (estacionBalas != null) estacionBalas.gameObject.SetActive(false);
 
         ActualizarContadoresTexto(0, 0);
     }
@@ -157,7 +174,22 @@ public class DisparoManager : MonoBehaviour
             if (animadorPistola != null) animadorPistola.Play("Pistola_Reposo");
         }
 
-        if (estacionBalas != null) estacionBalas.Desplegar();
+        bool verBalas = true;
+        if (DificultadManager.DificultadElegida == ModoDificultad.Dificil) verBalas = false;
+        else if (DificultadManager.DificultadElegida == ModoDificultad.Personalizado) verBalas = DificultadManager.CP_VerBalas;
+
+        if (estacionBalas != null) 
+        {
+            if (verBalas)
+            {
+                estacionBalas.gameObject.SetActive(true);
+                estacionBalas.Desplegar();
+            }
+            else
+            {
+                estacionBalas.gameObject.SetActive(false);
+            }
+        }
 
         SetInteractuable(turnoDelJugadorActual);
         NotificacionManager.Instance.MostrarMensaje(turnoDelJugadorActual ? "TU TURNO" : "TURNO DEL DEALER", true, 2.5f);
@@ -380,7 +412,6 @@ public class DisparoManager : MonoBehaviour
         return esReal;
     }
 
-    // --- AHORA TERMINAR EL TURNO USA CORRUTINAS AUTOMÁTICAS ---
     private void FinalizarTurno(string mensaje, bool volverACartas)
     {
         volverAFaseCartas = volverACartas;
@@ -391,7 +422,6 @@ public class DisparoManager : MonoBehaviour
 
     private IEnumerator RutinaTransicionTurno()
     {
-        // Esperamos a que el jugador lea el mensaje del disparo
         yield return new WaitForSeconds(2.5f);
 
         if (vidasJugador <= 0)
@@ -402,19 +432,19 @@ public class DisparoManager : MonoBehaviour
         {
             NotificacionManager.Instance.MostrarMensaje("¡ENEMIGO DERROTADO!", true, 2.5f);
             if (objetoPistola != null) objetoPistola.SetActive(false);
-            if (estacionBalas != null) estacionBalas.Ocultar();
+            if (estacionBalas != null && estacionBalas.gameObject.activeSelf) estacionBalas.Ocultar();
             fasesManager.VictoriaSobreEnemigo();
         }
         else if (indiceActual >= tambor.Count)
         {
             if (objetoPistola != null) objetoPistola.SetActive(false);
-            if (estacionBalas != null) estacionBalas.Ocultar();
+            if (estacionBalas != null && estacionBalas.gameObject.activeSelf) estacionBalas.Ocultar();
             fasesManager.ReiniciarRondaCompleta();
         }
         else if (volverAFaseCartas)
         {
             if (objetoPistola != null) objetoPistola.SetActive(false);
-            if (estacionBalas != null) estacionBalas.Ocultar();
+            if (estacionBalas != null && estacionBalas.gameObject.activeSelf) estacionBalas.Ocultar();
             fasesManager.IniciarFaseCartas();
         }
         else
@@ -454,8 +484,12 @@ public class DisparoManager : MonoBehaviour
 
     private void ActualizarContadoresTexto(int r, int f)
     {
-        if (textoReales != null) textoReales.text = r + "x Reales";
-        if (textoFogueo != null) textoFogueo.text = f + "x Fogueo";
+        bool verBalas = true;
+        if (DificultadManager.DificultadElegida == ModoDificultad.Dificil) verBalas = false;
+        else if (DificultadManager.DificultadElegida == ModoDificultad.Personalizado) verBalas = DificultadManager.CP_VerBalas;
+
+        if (textoReales != null) textoReales.text = verBalas ? r + "x Reales" : "??x Reales";
+        if (textoFogueo != null) textoFogueo.text = verBalas ? f + "x Fogueo" : "??x Fogueo";
     }
 
     private void SetInteractuable(bool estado)

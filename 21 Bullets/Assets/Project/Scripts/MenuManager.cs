@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
+using UnityEngine.Audio;
 using TMPro;
 using System.Collections;
 
@@ -7,6 +9,7 @@ public class MenuManager : MonoBehaviour
 {
     public GameObject panelOpciones;
     public GameObject panelCreditos;
+    public GameObject panelDificultad;
     public TextMeshProUGUI textoCabeceraCreditos;
 
     [Header("Configuracion de Escenas")]
@@ -14,21 +17,37 @@ public class MenuManager : MonoBehaviour
     public string nombreEscenaMenu;
 
     public AudioClip sonidoClick;
+    public AudioMixerGroup grupoAudio;
     private AudioSource audioSource;
 
     private string contenidoOriginalCreditos;
 
-    void Start()
+    IEnumerator Start()
     {
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
 
+        if (grupoAudio != null)
+        {
+            audioSource.outputAudioMixerGroup = grupoAudio;
+        }
+
         if (panelOpciones != null) panelOpciones.SetActive(false);
         if (panelCreditos != null) panelCreditos.SetActive(false);
+        if (panelDificultad != null) panelDificultad.SetActive(false);
 
         if (textoCabeceraCreditos != null)
         {
             contenidoOriginalCreditos = textoCabeceraCreditos.text;
+        }
+
+        yield return null;
+
+        if (grupoAudio != null)
+        {
+            float volumenGuardado = PlayerPrefs.GetFloat("VolumenMaster", 0.75f);
+            float volumenEnDecibelios = Mathf.Log10(Mathf.Clamp(volumenGuardado, 0.0001f, 1f)) * 20f;
+            grupoAudio.audioMixer.SetFloat("VolumenMaster", volumenEnDecibelios);
         }
     }
 
@@ -39,6 +58,10 @@ public class MenuManager : MonoBehaviour
             if (panelOpciones != null && panelOpciones.activeSelf)
             {
                 CerrarOpciones();
+            }
+            else if (panelDificultad != null && panelDificultad.activeSelf)
+            {
+                CerrarDificultad();
             }
             else if (panelCreditos != null && panelCreditos.activeSelf)
             {
@@ -72,6 +95,7 @@ public class MenuManager : MonoBehaviour
             CanvasGroup cg = panelCreditos.GetComponent<CanvasGroup>();
             if (cg != null) cg.alpha = 1;
         }
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
     public void AbrirCreditos()
@@ -86,6 +110,7 @@ public class MenuManager : MonoBehaviour
                 textoCabeceraCreditos.text = "<size=150%><b><color=#A30000>21 BULLETS</color></b></size>\n\n" + contenidoOriginalCreditos;
             }
         }
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
     public void VolverAlMenu()
@@ -96,11 +121,32 @@ public class MenuManager : MonoBehaviour
         {
             SceneManager.LoadScene(nombreEscenaMenu);
         }
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    public void AbrirDificultad()
+    {
+        if (sonidoClick != null && audioSource != null) audioSource.PlayOneShot(sonidoClick);
+        if (panelDificultad != null) panelDificultad.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    public void CerrarDificultad()
+    {
+        if (sonidoClick != null && audioSource != null) audioSource.PlayOneShot(sonidoClick);
+        if (panelDificultad != null) panelDificultad.SetActive(false);
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    public void ConfirmarJuego()
+    {
+        StartCoroutine(SecuenciaJugar());
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
     public void BotonJugar()
     {
-        StartCoroutine(SecuenciaJugar());
+        AbrirDificultad();
     }
 
     IEnumerator SecuenciaJugar()
@@ -114,18 +160,21 @@ public class MenuManager : MonoBehaviour
     {
         if (sonidoClick != null && audioSource != null) audioSource.PlayOneShot(sonidoClick);
         if (panelOpciones != null) panelOpciones.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
     public void CerrarOpciones()
     {
         if (sonidoClick != null && audioSource != null) audioSource.PlayOneShot(sonidoClick);
-        panelOpciones.SetActive(false);
+        if (panelOpciones != null) panelOpciones.SetActive(false);
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
     public void CerrarCreditos()
     {
         if (sonidoClick != null && audioSource != null) audioSource.PlayOneShot(sonidoClick);
-        panelCreditos.SetActive(false);
+        if (panelCreditos != null) panelCreditos.SetActive(false);
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
     public void BotonSalir()
