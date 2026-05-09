@@ -399,6 +399,7 @@ GameObject:
   - component: {fileID: 83388937}
   - component: {fileID: 83388936}
   - component: {fileID: 83388935}
+  - component: {fileID: 83388940}
   m_Layer: 5
   m_Name: "Boton Cr\xE9ditos"
   m_TagString: Untagged
@@ -555,6 +556,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 83388933}
   m_CullTransparentMesh: 1
+--- !u!114 &83388940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 83388933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f300605f25195047b9a41d2ef925a85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorManoApuntar: {fileID: 2800000, guid: a112abd7d8ad94c4a9a8aa7cabc34bec, type: 3}
 --- !u!1 &90594425
 GameObject:
   m_ObjectHideFlags: 0
@@ -706,6 +720,7 @@ GameObject:
   - component: {fileID: 123962490}
   - component: {fileID: 123962493}
   - component: {fileID: 123962494}
+  - component: {fileID: 123962495}
   m_Layer: 5
   m_Name: Boton Jugar
   m_TagString: Untagged
@@ -862,6 +877,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sonidoHover: {fileID: 8300000, guid: 90f21b033c6992c4d86c12c28e4508a4, type: 3}
+--- !u!114 &123962495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 123962488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f300605f25195047b9a41d2ef925a85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorManoApuntar: {fileID: 2800000, guid: a112abd7d8ad94c4a9a8aa7cabc34bec, type: 3}
 --- !u!1 &171336428
 GameObject:
   m_ObjectHideFlags: 0
@@ -8084,6 +8112,7 @@ GameObject:
   - component: {fileID: 1767677128}
   - component: {fileID: 1767677131}
   - component: {fileID: 1767677132}
+  - component: {fileID: 1767677133}
   m_Layer: 5
   m_Name: Boton Salir
   m_TagString: Untagged
@@ -8240,6 +8269,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sonidoHover: {fileID: 8300000, guid: 90f21b033c6992c4d86c12c28e4508a4, type: 3}
+--- !u!114 &1767677133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1767677126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f300605f25195047b9a41d2ef925a85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorManoApuntar: {fileID: 2800000, guid: a112abd7d8ad94c4a9a8aa7cabc34bec, type: 3}
 --- !u!1 &1803517363
 GameObject:
   m_ObjectHideFlags: 0
@@ -8365,6 +8407,7 @@ GameObject:
   - component: {fileID: 2005253705}
   - component: {fileID: 2005253708}
   - component: {fileID: 2005253709}
+  - component: {fileID: 2005253710}
   m_Layer: 5
   m_Name: Boton Opciones
   m_TagString: Untagged
@@ -8521,6 +8564,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sonidoHover: {fileID: 8300000, guid: 90f21b033c6992c4d86c12c28e4508a4, type: 3}
+--- !u!114 &2005253710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005253703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f300605f25195047b9a41d2ef925a85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorManoApuntar: {fileID: 2800000, guid: a112abd7d8ad94c4a9a8aa7cabc34bec, type: 3}
 --- !u!1 &2115442608
 GameObject:
   m_ObjectHideFlags: 0
