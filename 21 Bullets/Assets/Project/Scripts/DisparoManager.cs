@@ -65,16 +65,21 @@ public class DisparoManager : MonoBehaviour
     public Image pantallaRojaDaño;
     public GameObject muzzleFlashPistola;
 
+    private Coroutine rutinaAtenuarMusica;
+    private bool musicaSilenciada = false;
+
     void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+        heartbeatSource = gameObject.AddComponent<AudioSource>();
+
         vidasJugador = corazonesJugador.Length;
         ActualizarCorazonesUI();
 
         if (sfxMixerGroup != null)
         {
             audioSource.outputAudioMixerGroup = sfxMixerGroup;
-            if (heartbeatSource != null) heartbeatSource.outputAudioMixerGroup = sfxMixerGroup;
+            heartbeatSource.outputAudioMixerGroup = sfxMixerGroup;
         }
 
         if (pantallaRojaDaño != null)
@@ -87,11 +92,8 @@ public class DisparoManager : MonoBehaviour
 
         if (muzzleFlashPistola != null) muzzleFlashPistola.SetActive(false);
 
-        if (heartbeatSource != null)
-        {
-            heartbeatSource.loop = true;
-            heartbeatSource.clip = sonidoHeartbeat;
-        }
+        heartbeatSource.loop = true;
+        heartbeatSource.clip = sonidoHeartbeat;
 
         if (objetoPistola != null) objetoPistola.SetActive(false);
 
@@ -105,6 +107,14 @@ public class DisparoManager : MonoBehaviour
         {
             botonDealer.onClick.RemoveAllListeners();
             botonDealer.onClick.AddListener(DispararADealer);
+        }
+    }
+
+    void Update()
+    {
+        if (musicaSilenciada && sfxMixerGroup != null && sfxMixerGroup.audioMixer != null)
+        {
+            sfxMixerGroup.audioMixer.SetFloat("VolumenMusica", -80f);
         }
     }
 
@@ -266,6 +276,7 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasJugador -= danoMultiplicador;
                 ActualizarCorazonesUI();
+                StartCoroutine(EfectoPantallaRoja());
 
                 if (esposasActivasDealer)
                 {
@@ -358,6 +369,7 @@ public class DisparoManager : MonoBehaviour
             {
                 vidasJugador -= danoMultiplicador;
                 ActualizarCorazonesUI();
+                StartCoroutine(EfectoPantallaRoja());
 
                 if (esposasActivasJugador)
                 {
@@ -425,6 +437,8 @@ public class DisparoManager : MonoBehaviour
     private bool EjecutarDisparoLogico()
     {
         bool esReal = tambor[indiceActual];
+
+        if (esReal && muzzleFlashPistola != null) StartCoroutine(EfectoMuzzleFlash());
 
         if (slotsBalas[indiceActual] != null)
         {
@@ -521,12 +535,40 @@ public class DisparoManager : MonoBehaviour
             if (vidasJugador == 1)
             {
                 if (!heartbeatSource.isPlaying) heartbeatSource.Play();
+
+                if (rutinaAtenuarMusica != null) StopCoroutine(rutinaAtenuarMusica);
+                rutinaAtenuarMusica = StartCoroutine(TransicionMusica(0.0001f, true));
             }
             else
             {
                 if (heartbeatSource.isPlaying) heartbeatSource.Stop();
+
+                float volumenOriginal = PlayerPrefs.GetFloat("VolumenMusica", 0.75f);
+                if (rutinaAtenuarMusica != null) StopCoroutine(rutinaAtenuarMusica);
+                rutinaAtenuarMusica = StartCoroutine(TransicionMusica(volumenOriginal, false));
             }
         }
+    }
+
+    private IEnumerator TransicionMusica(float volumenLinealObjetivo, bool silenciarAlFinal)
+    {
+        if (sfxMixerGroup == null || sfxMixerGroup.audioMixer == null) yield break;
+
+        musicaSilenciada = false;
+        
+        sfxMixerGroup.audioMixer.GetFloat("VolumenMusica", out float dbActual);
+        float dbObjetivo = Mathf.Log10(Mathf.Clamp(volumenLinealObjetivo, 0.0001f, 1f)) * 20f;
+
+        float t = 0;
+        while (t < 1f)
+        {
+            t += Time.unscaledDeltaTime / 0.5f;
+            sfxMixerGroup.audioMixer.SetFloat("VolumenMusica", Mathf.Lerp(dbActual, dbObjetivo, t));
+            yield return null;
+        }
+        
+        sfxMixerGroup.audioMixer.SetFloat("VolumenMusica", dbObjetivo);
+        musicaSilenciada = silenciarAlFinal;
     }
 
     private IEnumerator EfectoPantallaRoja()
