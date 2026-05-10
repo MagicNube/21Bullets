@@ -555,7 +555,7 @@ public class DisparoManager : MonoBehaviour
         if (sfxMixerGroup == null || sfxMixerGroup.audioMixer == null) yield break;
 
         musicaSilenciada = false;
-        
+
         sfxMixerGroup.audioMixer.GetFloat("VolumenMusica", out float dbActual);
         float dbObjetivo = Mathf.Log10(Mathf.Clamp(volumenLinealObjetivo, 0.0001f, 1f)) * 20f;
 
@@ -566,7 +566,7 @@ public class DisparoManager : MonoBehaviour
             sfxMixerGroup.audioMixer.SetFloat("VolumenMusica", Mathf.Lerp(dbActual, dbObjetivo, t));
             yield return null;
         }
-        
+
         sfxMixerGroup.audioMixer.SetFloat("VolumenMusica", dbObjetivo);
         musicaSilenciada = silenciarAlFinal;
     }
@@ -577,14 +577,14 @@ public class DisparoManager : MonoBehaviour
         {
             pantallaRojaDaño.gameObject.SetActive(true);
             Color c = pantallaRojaDaño.color;
-            c.a = 0.5f;
+            c.a = 1f;
             pantallaRojaDaño.color = c;
 
             float t = 0;
             while (t < 1)
             {
-                t += Time.deltaTime / 0.5f;
-                c.a = Mathf.Lerp(0.5f, 0f, t);
+                t += Time.deltaTime / 1.5f;
+                c.a = Mathf.Lerp(1f, 0f, t);
                 pantallaRojaDaño.color = c;
                 yield return null;
             }
@@ -597,7 +597,7 @@ public class DisparoManager : MonoBehaviour
         if (muzzleFlashPistola != null)
         {
             muzzleFlashPistola.SetActive(true);
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.3f);
             muzzleFlashPistola.SetActive(false);
         }
     }
