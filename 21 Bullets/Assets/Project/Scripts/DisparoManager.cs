@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Audio;
 
 public class DisparoManager : MonoBehaviour
 {
@@ -57,11 +58,40 @@ public class DisparoManager : MonoBehaviour
 
     public int objetosUsadosEsteDisparo = 0;
 
+    [Header("Efectos Adicionales")]
+    public AudioMixerGroup sfxMixerGroup;
+    public AudioSource heartbeatSource;
+    public AudioClip sonidoHeartbeat;
+    public Image pantallaRojaDaño;
+    public GameObject muzzleFlashPistola;
+
     void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         vidasJugador = corazonesJugador.Length;
         ActualizarCorazonesUI();
+
+        if (sfxMixerGroup != null)
+        {
+            audioSource.outputAudioMixerGroup = sfxMixerGroup;
+            if (heartbeatSource != null) heartbeatSource.outputAudioMixerGroup = sfxMixerGroup;
+        }
+
+        if (pantallaRojaDaño != null)
+        {
+            Color c = pantallaRojaDaño.color;
+            c.a = 0f;
+            pantallaRojaDaño.color = c;
+            pantallaRojaDaño.gameObject.SetActive(false);
+        }
+
+        if (muzzleFlashPistola != null) muzzleFlashPistola.SetActive(false);
+
+        if (heartbeatSource != null)
+        {
+            heartbeatSource.loop = true;
+            heartbeatSource.clip = sonidoHeartbeat;
+        }
 
         if (objetoPistola != null) objetoPistola.SetActive(false);
 
@@ -178,7 +208,7 @@ public class DisparoManager : MonoBehaviour
         if (DificultadManager.DificultadElegida == ModoDificultad.Dificil) verBalas = false;
         else if (DificultadManager.DificultadElegida == ModoDificultad.Personalizado) verBalas = DificultadManager.CP_VerBalas;
 
-        if (estacionBalas != null) 
+        if (estacionBalas != null)
         {
             if (verBalas)
             {
@@ -479,6 +509,54 @@ public class DisparoManager : MonoBehaviour
         {
             if (corazonesDealer[i] != null)
                 corazonesDealer[i].sprite = (i < vidasDealer) ? corazonLleno : corazonVacio;
+        }
+
+        ControlarHeartbeat();
+    }
+
+    private void ControlarHeartbeat()
+    {
+        if (heartbeatSource != null && sonidoHeartbeat != null)
+        {
+            if (vidasJugador == 1)
+            {
+                if (!heartbeatSource.isPlaying) heartbeatSource.Play();
+            }
+            else
+            {
+                if (heartbeatSource.isPlaying) heartbeatSource.Stop();
+            }
+        }
+    }
+
+    private IEnumerator EfectoPantallaRoja()
+    {
+        if (pantallaRojaDaño != null)
+        {
+            pantallaRojaDaño.gameObject.SetActive(true);
+            Color c = pantallaRojaDaño.color;
+            c.a = 0.5f;
+            pantallaRojaDaño.color = c;
+
+            float t = 0;
+            while (t < 1)
+            {
+                t += Time.deltaTime / 0.5f;
+                c.a = Mathf.Lerp(0.5f, 0f, t);
+                pantallaRojaDaño.color = c;
+                yield return null;
+            }
+            pantallaRojaDaño.gameObject.SetActive(false);
+        }
+    }
+
+    private IEnumerator EfectoMuzzleFlash()
+    {
+        if (muzzleFlashPistola != null)
+        {
+            muzzleFlashPistola.SetActive(true);
+            yield return new WaitForSeconds(0.1f);
+            muzzleFlashPistola.SetActive(false);
         }
     }
 
