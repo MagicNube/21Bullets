@@ -7868,7 +7868,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.28, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1504074726}
@@ -11925,6 +11925,8 @@ MonoBehaviour:
   spriteCajaAbierta: {fileID: 1965799515661770701, guid: 71e7ae4cbc9797b47a8528f58e34e07f, type: 3}
   posicionCajaJugador: {fileID: 2069491012}
   posicionCajaDealer: {fileID: 1272596254}
+  sonidoAbrirCaja: {fileID: 8300000, guid: 6c53744a5d25dc84aa025f047f5b9367, type: 3}
+  sonidoRepartirObjeto: {fileID: 8300000, guid: 8dad980b27b14394bab3b3a311f8c066, type: 3}
   cursorManoCerrada: {fileID: 2800000, guid: 950b1d4d6ffe0bd4f9175b3d9efe2154, type: 3}
   cursorManoApuntar: {fileID: 2800000, guid: 8e883ec46d697c3478d28c9cf6e29c57, type: 3}
   distanciaInteraccion: 3.5
