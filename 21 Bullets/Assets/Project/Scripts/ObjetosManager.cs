@@ -306,15 +306,23 @@ public class ObjetosManager : MonoBehaviour
         bool enFaseCartas = fasesManager.contenedorCartas.activeSelf;
         bool enFaseDisparo = fasesManager.contenedorDisparo.activeSelf;
 
+        bool sinLimites = false;
+        if (DificultadManager.DificultadElegida == ModoDificultad.Normal) sinLimites = true;
+        else if (DificultadManager.DificultadElegida == ModoDificultad.Personalizado) sinLimites = DificultadManager.CP_SinLimitesObjetos;
+
+        if (!sinLimites)
+        {
+            if (enFaseCartas && cartasManager.objetosUsadosEnCartas >= 2) return false;
+            if (enFaseDisparo && disparoManager.objetosUsadosEsteDisparo >= 1) return false;
+        }
+
         if (enFaseCartas)
         {
-            if (cartasManager.objetosUsadosEnCartas >= 2) return false;
             if (esParaJugador) return tipo == TipoObjeto.Tijeras || tipo == TipoObjeto.RayosX || tipo == TipoObjeto.Lupa || tipo == TipoObjeto.Botiquin;
             else return tipo == TipoObjeto.Tijeras || tipo == TipoObjeto.Lupa || tipo == TipoObjeto.Botiquin;
         }
         else if (enFaseDisparo)
         {
-            if (disparoManager.objetosUsadosEsteDisparo >= 1) return false;
             return tipo == TipoObjeto.Botiquin || tipo == TipoObjeto.Esposas || tipo == TipoObjeto.Inversor ||
                    tipo == TipoObjeto.Lupa || tipo == TipoObjeto.Muñeco || tipo == TipoObjeto.Polvora ||
                    tipo == TipoObjeto.Telefono;
