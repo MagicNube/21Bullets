@@ -12933,6 +12933,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panelPausa: {fileID: 1108259185}
   panelOpciones: {fileID: 1433469342}
+  panelCreditosFinal: {fileID: 1921695680}
   nombreEscenaMenu: "02_MEN\xDA"
   sonidoClick: {fileID: 8300000, guid: c8d37a9c2e8d9a849b286679a139afee, type: 3}
   grupoAudio: {fileID: 8836470836236837673, guid: 7f79e70adc8c79443ad54e69ddda2dfc, type: 2}

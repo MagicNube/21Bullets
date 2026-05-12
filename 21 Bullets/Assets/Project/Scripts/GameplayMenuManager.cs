@@ -8,6 +8,7 @@ public class GameplayMenuManager : MonoBehaviour
 {
     public GameObject panelPausa;
     public GameObject panelOpciones;
+    public GameObject panelCreditosFinal;
     public string nombreEscenaMenu;
 
     public AudioClip sonidoClick;
@@ -52,6 +53,11 @@ public class GameplayMenuManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            if (panelCreditosFinal != null && panelCreditosFinal.activeSelf)
+            {
+                return;
+            }
+
             if (panelOpciones != null && panelOpciones.activeSelf)
             {
                 CerrarOpciones();
