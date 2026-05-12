@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: af1f334cec764a64e9d260aa2cf631d2
+=======
+guid: e4c53cb490952c74a8284785a0862fb8
+>>>>>>> 8cdf627 (sonidos finales y arreglar info guante)
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

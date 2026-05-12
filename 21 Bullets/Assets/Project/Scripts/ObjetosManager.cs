@@ -31,6 +31,12 @@ public class ObjetosManager : MonoBehaviour
     public Transform posicionCajaJugador;
     public Transform posicionCajaDealer;
 
+
+    [Header("Sonidos")]
+    public AudioClip sonidoAbrirCaja;
+    public AudioClip sonidoRepartirObjeto;
+    private AudioSource audioSource;
+
     [Header("Cursores Especiales")]
     public Texture2D cursorManoCerrada;
     public Texture2D cursorManoApuntar;
@@ -41,7 +47,7 @@ public class ObjetosManager : MonoBehaviour
 
     [HideInInspector]
     public bool enemigoRecibeObjetos = false;
-    
+
     [HideInInspector]
     public bool repartiendoObjetos = false;
 
@@ -56,6 +62,8 @@ public class ObjetosManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         if (objetoCajaVisual != null) objetoCajaVisual.SetActive(false);
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
     }
 
     void Update()
@@ -124,7 +132,7 @@ public class ObjetosManager : MonoBehaviour
                             }
                         }
                     }
-                    
+
                     oi.SetActivo(usable);
                 }
             }
@@ -194,6 +202,7 @@ public class ObjetosManager : MonoBehaviour
         yield return new WaitUntil(() => !esperandoClickCaja);
 
         if (spriteRendererCaja != null) spriteRendererCaja.sprite = spriteCajaAbierta;
+        if (audioSource != null && sonidoAbrirCaja != null) audioSource.PlayOneShot(sonidoAbrirCaja); // <-- PÓNLO AQUÍ
         yield return new WaitForSeconds(0.4f);
 
         for (int i = 0; i < cantidadJugador; i++)
@@ -210,6 +219,7 @@ public class ObjetosManager : MonoBehaviour
                 GameObject objAnim = Instantiate(prefabObjetoAnimacion, posicionCajaJugador.position, Quaternion.identity);
                 objetosJugador[slotLibre] = objAnim;
 
+                if (audioSource != null && sonidoRepartirObjeto != null) audioSource.PlayOneShot(sonidoRepartirObjeto);
                 yield return StartCoroutine(AnimarObjetoVolando(objAnim, nuevoObjeto, slotsJugador[slotLibre], posicionCajaJugador.position, true));
                 yield return new WaitForSeconds(tiempoEntreObjetos);
             }
@@ -232,6 +242,7 @@ public class ObjetosManager : MonoBehaviour
             yield return new WaitForSeconds(0.8f);
 
             if (spriteRendererCaja != null) spriteRendererCaja.sprite = spriteCajaAbierta;
+            if (audioSource != null && sonidoAbrirCaja != null) audioSource.PlayOneShot(sonidoAbrirCaja);
             yield return new WaitForSeconds(0.4f);
 
             for (int i = 0; i < cantidadARepartir; i++)
@@ -245,6 +256,7 @@ public class ObjetosManager : MonoBehaviour
                     objetosDealer[slotLibre] = objAnim;
                     tiposDealer[slotLibre] = nuevoObjeto;
 
+                    if (audioSource != null && sonidoRepartirObjeto != null) audioSource.PlayOneShot(sonidoRepartirObjeto);
                     yield return StartCoroutine(AnimarObjetoVolando(objAnim, nuevoObjeto, slotsDealer[slotLibre], posicionCajaDealer.position, false));
                     yield return new WaitForSeconds(tiempoEntreObjetos);
                 }
@@ -609,7 +621,7 @@ public class ObjetosManager : MonoBehaviour
             {
                 Destroy(objetosDealer[closestIndex]);
                 objetosDealer[closestIndex] = null;
-                NotificacionManager.Instance.MostrarMensaje($"¡Has robado y usado: {tipoRobado}!", true, 3f);
+                //NotificacionManager.Instance.MostrarMensaje($"¡Has robado y usado: {tipoRobado}!", true, 3f);
                 return true;
             }
             else
@@ -668,7 +680,7 @@ public class ObjetosManager : MonoBehaviour
     private IEnumerator RutinaAnimarYUsarObjetoDealer(int index, TipoObjeto tipo)
     {
         GameObject obj = objetosDealer[index];
-        objetosDealer[index] = null; 
+        objetosDealer[index] = null;
 
         Vector3 posInicial = obj.transform.position;
         Vector3 posCentro = Camera.main != null ? new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, 0f) : Vector3.zero;
