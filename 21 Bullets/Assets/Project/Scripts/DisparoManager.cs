@@ -15,6 +15,10 @@ public class DisparoManager : MonoBehaviour
     [Header("Visuales Pistola")]
     public GameObject objetoPistola;
     public Animator animadorPistola;
+    public Sprite spriteSangre;
+
+    public float duracionGiroPistola = 1.2f;
+    public int vueltasGiroPistola = 3;
 
     public Sprite spriteBalaReal;
     public Sprite spriteBalaFogueo;
@@ -40,6 +44,8 @@ public class DisparoManager : MonoBehaviour
 
     private int totalRealesCalculadas = 0;
     private int totalFogueosCalculadas = 0;
+
+    private Quaternion rotacionOriginalPistola;
 
     private int vidasJugador = 3;
     public int vidasDealer = 3;
@@ -108,6 +114,8 @@ public class DisparoManager : MonoBehaviour
             botonDealer.onClick.RemoveAllListeners();
             botonDealer.onClick.AddListener(DispararADealer);
         }
+
+        if (objetoPistola != null) rotacionOriginalPistola = objetoPistola.transform.rotation;
     }
 
     void Update()
@@ -200,6 +208,7 @@ public class DisparoManager : MonoBehaviour
 
     public void IniciarFase(bool turnoJugador)
     {
+        if (objetoPistola != null) objetoPistola.transform.rotation = rotacionOriginalPistola;
         volverAFaseCartas = false;
         turnoDelJugadorActual = turnoJugador;
         objetosUsadosEsteDisparo = 0;
@@ -256,10 +265,40 @@ public class DisparoManager : MonoBehaviour
         StartCoroutine(EjecutarDisparoDealerRoutine(dispararAJugador));
     }
 
+    private IEnumerator RutinaGirarPistola(bool apuntarAJugador)
+    {
+        if (animadorPistola != null) animadorPistola.enabled = false;
+
+        objetoPistola.transform.rotation = rotacionOriginalPistola;
+        float anguloInicial = rotacionOriginalPistola.eulerAngles.z;
+
+        float offsetGrados = apuntarAJugador ? 90f : 270f;
+
+        float rotacionTotal = (360f * vueltasGiroPistola) + offsetGrados;
+
+        float anguloFinal = anguloInicial + offsetGrados;
+
+        float t = 0;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / duracionGiroPistola;
+            float easedT = 1f - Mathf.Pow(1f - t, 3f);
+
+            float anguloActual = anguloInicial + (rotacionTotal * easedT);
+            objetoPistola.transform.rotation = Quaternion.Euler(0, 0, anguloActual);
+
+            yield return null;
+        }
+
+        objetoPistola.transform.rotation = Quaternion.Euler(0, 0, anguloFinal);
+    }
+
     private IEnumerator EjecutarDisparoDealerRoutine(bool dispararAJugador)
     {
-        if (animadorPistola != null) animadorPistola.Play(dispararAJugador ? "Pistola_ApuntarJugador" : "Pistola_ApuntarDealer");
-        yield return new WaitForSeconds(1.5f);
+        yield return StartCoroutine(RutinaGirarPistola(dispararAJugador));
+
+        yield return new WaitForSeconds(0.6f);
+
         if (!ComprobarSeguridad()) yield break;
 
         bool esReal = EjecutarDisparoLogico();
@@ -351,9 +390,9 @@ public class DisparoManager : MonoBehaviour
 
     private IEnumerator RutinaDisparoJugador(bool dispararAJugador)
     {
-        if (animadorPistola != null) animadorPistola.Play(dispararAJugador ? "Pistola_ApuntarJugador" : "Pistola_ApuntarDealer");
+        yield return StartCoroutine(RutinaGirarPistola(dispararAJugador));
 
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(0.4f);
 
         bool esReal = EjecutarDisparoLogico();
         bool tamborVacio = (indiceActual >= tambor.Count);
@@ -493,7 +532,13 @@ public class DisparoManager : MonoBehaviour
         }
         else
         {
-            if (animadorPistola != null) animadorPistola.Play("Pistola_Reposo");
+            if (animadorPistola != null)
+            {
+                animadorPistola.enabled = true;
+                if (objetoPistola != null) objetoPistola.transform.rotation = rotacionOriginalPistola;
+
+                animadorPistola.Play("Pistola_Reposo");
+            }
 
             if (turnoDelJugadorActual)
             {
@@ -576,15 +621,29 @@ public class DisparoManager : MonoBehaviour
         if (pantallaRojaDaño != null)
         {
             pantallaRojaDaño.gameObject.SetActive(true);
+
+            bool mostrarSangre = PlayerPrefs.GetInt("OpcionSangre", 1) == 1;
+
+            if (mostrarSangre && spriteSangre != null)
+            {
+                pantallaRojaDaño.sprite = spriteSangre;
+                pantallaRojaDaño.color = new Color(1f, 1f, 1f, 0.5f);
+            }
+            else
+            {
+                pantallaRojaDaño.sprite = null;
+                pantallaRojaDaño.color = new Color(1f, 0f, 0f, 0.5f);
+            }
+
             Color c = pantallaRojaDaño.color;
-            c.a = 1f;
-            pantallaRojaDaño.color = c;
+
+            yield return new WaitForSeconds(0.2f);
 
             float t = 0;
             while (t < 1)
             {
                 t += Time.deltaTime / 1.5f;
-                c.a = Mathf.Lerp(1f, 0f, t);
+                c.a = Mathf.Lerp(0.5f, 0f, t);
                 pantallaRojaDaño.color = c;
                 yield return null;
             }
@@ -747,6 +806,9 @@ public class DisparoManager : MonoBehaviour
 
     private IEnumerator RutinaMuñeco(bool esJugador)
     {
+
+        if (objetoPistola != null) objetoPistola.transform.rotation = rotacionOriginalPistola;
+
         SetInteractuable(false);
         if (animadorPistola != null) animadorPistola.Play("Pistola_Reposo");
         yield return new WaitForSeconds(0.5f);

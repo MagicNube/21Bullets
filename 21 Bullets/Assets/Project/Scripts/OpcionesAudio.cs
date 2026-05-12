@@ -6,17 +6,34 @@ using UnityEngine.UI;
 public class OpcionesAudio : MonoBehaviour
 {
     public AudioMixer mezclador;
-    
+
     [Header("Sliders de Volumen")]
     public Slider sliderMaster;
     public Slider sliderMusica;
     public Slider sliderSFX;
+
+    [Header("Opciones Visuales")]
+    public Toggle toggleSangre; 
 
     void Start()
     {
         ConfigurarSlider(sliderMaster, "VolumenMaster");
         ConfigurarSlider(sliderMusica, "VolumenMusica");
         ConfigurarSlider(sliderSFX, "VolumenSFX");
+
+        if (toggleSangre != null)
+        {
+            bool sangreActivada = PlayerPrefs.GetInt("OpcionSangre", 1) == 1;
+            toggleSangre.isOn = sangreActivada;
+
+            toggleSangre.onValueChanged.AddListener(CambiarSangre);
+        }
+    }
+
+    public void CambiarSangre(bool activo)
+    {
+        PlayerPrefs.SetInt("OpcionSangre", activo ? 1 : 0);
+        PlayerPrefs.Save();
     }
 
     private void ConfigurarSlider(Slider slider, string parametroNombre)
@@ -25,9 +42,9 @@ public class OpcionesAudio : MonoBehaviour
         {
             float volumenGuardado = PlayerPrefs.GetFloat(parametroNombre, 0.75f);
             slider.value = volumenGuardado;
-            
+
             slider.onValueChanged.AddListener((valor) => CambiarVolumen(parametroNombre, valor));
-            
+
             StartCoroutine(AplicarVolumenSeguro(parametroNombre, volumenGuardado));
         }
     }
@@ -47,7 +64,7 @@ public class OpcionesAudio : MonoBehaviour
 
     private IEnumerator AplicarVolumenSeguro(string parametroNombre, float valor)
     {
-        yield return null; 
+        yield return null;
         AplicarVolumen(parametroNombre, valor);
     }
 }
